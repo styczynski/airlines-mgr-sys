@@ -17,5 +17,9 @@ $(document).ready(function(){
         html: '<code>' + value + '</code>'
       };
     })
-    .sortableTable('view');
+    .sortableTable('view')
+    .sortableTable('rowClick', function(row, table, context) {
+      console.log(context);
+      window.location = 'flight-edit?id='+context+'&back='+encodeURIComponent(window.location);
+    });
 });

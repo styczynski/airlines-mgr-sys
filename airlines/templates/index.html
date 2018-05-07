@@ -31,6 +31,12 @@
           {% include "navigation/navigation.html" %}
         </nav>
       
+        {% if content == 'flight-edit-not-found' %}
+          {% include "content/flight-edit-not-found.html" %}
+        {% endif %}
+        {% if content == 'flight-edit' %}
+          {% include "content/flight-edit.html" %}
+        {% endif %}
         {% if content == 'flights' %}
           {% include "content/flights.html" %}
         {% endif %}

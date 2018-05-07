@@ -136,6 +136,34 @@ def flights(request):
     ]
   )
   
+def flightEdit(request):
+  backURL = request.GET.get('back', None)
+  id = request.GET.get('id', None)
+  if not id:
+    template = loader.get_template('index.html')
+    context = {
+      'content': 'flight-edit-not-found',
+      'back_button': backURL
+    }
+    return HttpResponse(template.render(context, request))
+  
+  flight = Flight.objects.get(id=id)
+  if not flight:
+    template = loader.get_template('index.html')
+    context = {
+      'content': 'flight-edit-not-found',
+      'back_button': backURL
+    }
+    return HttpResponse(template.render(context, request))
+    
+  template = loader.get_template('index.html')
+  context = {
+    'content': 'flight-edit',
+    'flight': flight,
+    'back_button': backURL
+  }
+  return HttpResponse(template.render(context, request))
+  
 
 def planes(request):
   data_list = Plane.objects.annotate(number_of_flights=Count('flight'))
@@ -172,17 +200,27 @@ def dataGenerator(request):
     form = DataGeneratorForm(request.POST)
     if form.is_valid():
       context['content'] = 'data-generator-answer'
-      data = PlanesGenerator(Plane, Flight, form)
+      data = PlanesGenerator(Plane, Flight, User, form)
       context['content_message'] = 'Generated '+str(len(data['planes']))+' planes and '+str(len(data['flights']))+' flights'
       
   else:
+    #form = DataGeneratorForm(initial={
+    #  'users_count': 5,
+    #  'planes_count': 1,
+    #  'plane_seats_count_min': 1,
+    #  'plane_seats_count_max': 2,
+    #  'plane_flights_count_min': 2,
+    #  'plane_flights_count_max': 4,
+    #  'plane_reg_format': 'CCCNNNNNN'
+    #})
     form = DataGeneratorForm(initial={
+      'users_count': 5000,
       'planes_count': 60,
       'plane_seats_count_min': 11,
       'plane_seats_count_max': 450,
       'plane_flights_count_min': 0,
       'plane_flights_count_max': 18,
-      'lane_reg_format': 'CCCNNNNNN'
+      'plane_reg_format': 'CCCNNNNNN'
     })
    
   context['form'] = form

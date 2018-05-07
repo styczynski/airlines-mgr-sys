@@ -1,4 +1,10 @@
 <ul>
+  {% if back_button %}
+    <li class="backButton">
+      <a href="{{ back_button }}"> &lt; </a>
+    </li>
+  {% endif %}
+
   {% if content == 'planes' %}
     <li class="active">
       <a href="/airlines/planes">Planes</a>

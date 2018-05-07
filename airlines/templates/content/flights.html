@@ -63,7 +63,7 @@
 
     {% if page_data %}
       {% for flight in page_data %}
-        <tr>
+        <tr data-context="{{ flight.id }}">
             <td>{{ flight.plane.reg_id }}</td>
             <td>{{ flight.src }}</td>
             <td>{{ flight.dest }}</td>

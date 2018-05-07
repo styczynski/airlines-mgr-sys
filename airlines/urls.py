@@ -8,6 +8,7 @@ urlpatterns = [
   path('planes', views.planes, name='planes'),
   path('flights', views.flights, name='flights'),
   path('users', views.users, name='users'),
+  path('flight-edit', views.flightEdit, name='flightEdit'),
   path('data-generator', views.dataGenerator, name='dataGenerator'),
   path('admin-popup', views.adminPopup, name='adminPopup'),
   path('data-generator-popup', views.dataGeneratorPopup, name='dataGeneratorPopup'),

@@ -212,7 +212,12 @@ var SortableTable = {};
             rowData[name] = colA.value;
           });
           
-          handler(rowData, table);
+          var context = clickedElement.data('context');
+          if(!context) {
+            context = {};
+          }
+          
+          handler(rowData, table, context);
         });
       });
     },

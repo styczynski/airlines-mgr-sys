@@ -1,0 +1,41 @@
+<table>
+  <thead>
+    <tr>
+      <th>Atttribute</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr>
+      <td>Connection</td>
+      <td>
+        <b>
+          {{ flight.src }} to {{ flight.dest }}
+        </b>
+        <code>
+          {{ flight.plane.reg_id }}
+        </code>
+      </td>
+    </tr>
+    
+    <tr>
+      <td>Departure / Arrival</td>
+      <td>{{ flight.start }} / {{ flight.end }}</td>
+    </tr>
+     
+    <tr>
+      <td>Bought tickets</td>
+      <td>{{ flight.tickets.count }} / {{ flight.plane.seats_count }}</td>
+    </tr>
+
+  </tbody>
+</table>
+
+{% if back_button %}
+  <a href="{{ back_button }}">
+    <button class="backButton">
+      &lt; Cancel
+    </button>
+  </a>
+{% endif %}

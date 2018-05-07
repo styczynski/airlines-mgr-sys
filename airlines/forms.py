@@ -1,6 +1,7 @@
 from django import forms
 
 class DataGeneratorForm(forms.Form):
+  users_count = forms.DecimalField(label='No. of users to be generated', min_value=1, max_value=1000000)
   planes_count = forms.DecimalField(label='No. of planes to be generated', min_value=1, max_value=1000000)
   plane_seats_count_min = forms.DecimalField(label='Minimum number of seats', min_value=0, max_value=10000)
   plane_seats_count_max = forms.DecimalField(label='Maximum number of seats', min_value=0, max_value=10000)
