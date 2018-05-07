@@ -1,0 +1,31 @@
+<ul>
+  {% if content == 'planes' %}
+    <li class="active">
+      <a href="/airlines/planes">Planes</a>
+    </li>
+  {% else %}
+    <li>
+      <a href="/airlines/planes">Planes</a>
+    </li>
+  {% endif %}
+  
+  {% if content == 'flights' %}
+    <li class="active">
+      <a href="/airlines/flights">Flights</a>
+    </li>
+  {% else %}
+    <li>
+      <a href="/airlines/flights">Flights</a>
+    </li>
+  {% endif %}
+  
+  {% if content == 'users' %}
+    <li class="active">
+      <a href="/airlines/users">Users</a>
+    </li>
+  {% else %}
+    <li>
+      <a href="/airlines/users">Users</a>
+    </li>
+  {% endif %}
+</ul>

@@ -1,0 +1,77 @@
+table td, table th {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table {
+  font-family: 'PT Sans', sans-serif;
+  border-spacing: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+
+table thead {
+  background-color: #975259;
+  color: white;
+}
+
+table thead tr {
+  
+}
+
+table thead th {
+  padding: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+table thead th a {
+  text-decoration: none;
+  color: white;
+}
+
+table thead th:hover {
+  background: white;
+  color: #975259;
+}
+
+table thead th:hover a {
+  color: #975259;
+}
+
+table thead .sort-asc:after {
+  width: 13px;
+  display: inline-block;
+  content: "↓";
+}
+
+table thead .sort-desc:after {
+  width: 13px;
+  display: inline-block;
+  content: "↑";
+}
+
+table tbody td {
+  padding-left: 50px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: rgba(249, 195, 200, 0.0784313725490196);
+  border-bottom: 1px #975259 solid;
+  cursor: pointer;
+  user-select: none;
+}
+
+table tbody tr:hover {
+  background: #975259;
+  color: white;
+}
+
+table tbody tr td code {
+  background: #e6d79e59;
+  padding: 5px;
+  border: 1px solid #cca8a8;
+  font-family: Consolas;
+  font-size: 76%;
+  font-weight: bold;
+}

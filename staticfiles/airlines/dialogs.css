@@ -1,0 +1,79 @@
+.dialog {
+  color: black;
+  font-family: 'PT Sans', sans-serif;
+  background-color: white;
+  width: 91vw;
+  height: 90vh;
+}
+
+.dialog > main {
+  padding: 5vw;
+}
+
+.dialog > header {
+  font-size: 200%;
+  font-weight: bold;
+  background-color: #7d444a;
+  padding: 1vw;
+  color: white;
+  text-align: center;
+}
+
+.dialog > iframe {
+  width: 91vw;
+  height: 77vh;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dialogContent {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+button.mfp-close {
+  background-color: #4c2b2e !important;
+  color: white !important;
+  z-index: 999999999999 !important;
+  opacity: 1 !important;
+  top: 16px !important;
+  right: 6vw !important;
+  height: 66px !important;
+}
+
+.dialogContent form input, select {
+  font-family: 'PT Sans', sans-serif;
+  display: block;
+}
+
+.dialogContent form label {
+  font-family: 'PT Sans', sans-serif;
+}
+
+.dialogContent form input[type="submit"] {
+  background-color: #4c2b2e;
+  color: white;
+  font-weight: bold;
+  padding: 1vw;
+  border: none;
+  padding-left: 20vw;
+  padding-right: 20vw;
+  margin-left: 25vw;
+  margin-top: 2vw;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.dialogContent form input[type="submit"]:hover {
+  background-color: white;
+  color: #4c2b2e;
+  border: 2px solid #4c2b2e;
+}
+
+.dialog.small {
+  width: 91vw;
+  height: 90vh;
+  max-height: 420px;
+}

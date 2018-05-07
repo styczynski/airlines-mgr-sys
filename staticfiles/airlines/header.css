@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body > header {
+  font-family: 'PT Sans', sans-serif;
+  font-size: 200%;
+  font-weight: bold;
+  color: white;
+  background-color: #7d444a;
+  margin: 0;
+  padding-top: 3vw;
+  padding-bottom: 3vw;
+}
+
+body > header i {
+  margin-right: 1vw;
+  margin-left: 2vw;
+}
+
+body > nav {
+  font-family: 'PT Sans', sans-serif;
+  color: white;
+  background-color: rgba(125, 68, 74, 0.89);
+  margin-top: 0;
+  margin-left: 0;
+  padding-top: 0.5vw;
+  padding-bottom: 0.5vw;
+}
+
+body > nav ul {
+  font-family: 'PT Sans', sans-serif;
+  margin: 0;
+  user-select: none;
+  list-style: none;
+  font-size: 120%;
+  font-weight: bold;
+}
+
+body > nav ul li {
+  font-size: 100%;
+  background-color: #7d444aed;
+  padding: 0.5vw;
+  display: inline;
+  cursor: pointer;
+  border-left: 2px solid white;
+  border-right: 2px solid white;
+  margin-right: -2px;
+}
+
+body > nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+body > nav ul li:hover {
+  background-color: white;
+  color: #5f3237;
+}
+
+body > nav ul li:hover a {
+  color: #5f3237;
+}

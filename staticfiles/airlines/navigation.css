@@ -1,0 +1,67 @@
+
+main > nav ul {
+  font-family: 'PT Sans', sans-serif;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  background-color: #5f3237;
+  user-select: none;
+}
+
+main > nav ul li {
+  font-weight: bold;
+  color: white;
+  max-width: 56vw;
+  display: inline-block;
+  cursor: pointer;
+}
+
+main > nav ul li.active {
+  color: white;
+  background-color: #975259;
+}
+
+main > nav ul li.active a {
+  color: white;
+}
+
+main > nav ul li a {
+  text-decoration: none;
+  color: white;
+  padding-left: 10vw;
+  padding-right: 10vw;
+  padding-top: 1vw;
+  padding-bottom: 1vw;
+  display: block;
+}
+
+main > nav ul li:hover { 
+  background-color: white;
+  color: #5f3237;
+}
+
+main > nav ul li:hover a { 
+  color: #5f3237;
+}
+
+.pages {
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  margin: 0;
+  border: none;
+  display: block;
+  text-align: center;
+}
+
+main > .pages ul {
+  /*padding-left: 50vw;*/
+  text-align: center;
+}
+
+main > .pages ul li a {
+  padding-left: 5px;
+  padding-right: 5px;
+  display: block;
+}
