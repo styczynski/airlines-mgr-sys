@@ -1,7 +1,7 @@
 <table>
   <thead>
     <tr>
-      <th>Atttribute</th>
+      <th>Property</th>
       <th>Value</th>
     </tr>
   </thead>
@@ -28,14 +28,99 @@
       <td>Bought tickets</td>
       <td>{{ flight.tickets.count }} / {{ flight.plane.seats_count }}</td>
     </tr>
-
+    
   </tbody>
 </table>
+
+{% if page_data %}
+  <table>
+    <thead>
+      <tr>
+        <th>
+          <a 
+            class="{{ sort_links.surname.mode }}"
+            href="{{ sort_links.surname.link }}"
+          >
+            Surname
+          </a>
+        </th>
+        <th>
+          <a 
+            class="{{ sort_links.name.mode }}"
+            href="{{ sort_links.name.link }}"
+          >
+            Name
+          </a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in page_data %}
+        <tr>
+          <td>
+            {{ user.surname }}
+          </td>
+          <td>
+            {{ user.name }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+<nav class="pages">
+  <ul>
+    {% if first_page %}
+      <li>
+        <a href="{{ first_page }}">
+          &lt;&lt;
+        </a>
+      </li>
+    {% endif %}
+    {% if previous_page %}
+      <li>
+        <a href="{{ previous_page }}">
+          &lt;
+        </a>
+      </li>
+    {% endif %}
+    {% for page in pages %}
+      {% if page.no == current_page %}
+        <li class="active">
+          <a href="{{ page.link }}">
+            {{ page.no }}
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a href="{{ page.link }}">
+            {{ page.no }}
+          </a>
+        </li>
+      {% endif %}
+    {% endfor %}
+    {% if next_page %}
+      <li>
+        <a href="{{ next_page }}">
+          &gt;
+        </a>
+      </li>
+    {% endif %}
+    {% if last_page %}
+      <li>
+        <a href="{{ last_page }}">
+          &gt;&gt;
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
 
 {% if back_button %}
   <a href="{{ back_button }}">
     <button class="backButton">
-      &lt; Cancel
+      &lt; Go back
     </button>
   </a>
 {% endif %}

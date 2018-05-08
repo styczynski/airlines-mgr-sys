@@ -2,16 +2,18 @@ from django.http import HttpResponse
 from django.template import loader
 from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils.http import urlencode
 
 from .models import Plane, Flight, User
 from .forms import DataGeneratorForm
 from .datagenerator.planes import PlanesGenerator
 
-PAGE_SIZE = 30
+DEFAULT_PAGE_SIZE     = 30
+FLIGHT_EDIT_PAGE_SIZE = 15
 
-def paginateContent(pageName, request, data_list, attr_names):
+def paginateContent(pageName, request, data_list, attr_names, page_size=DEFAULT_PAGE_SIZE, link_has_params=False):
   
-  global PAGE_SIZE
+  global DEFAULT_PAGE_SIZE
   
   page = request.GET.get('page', 1)
   orderby = request.GET.get('orderby', '')
@@ -38,7 +40,7 @@ def paginateContent(pageName, request, data_list, attr_names):
     data_list = data_list.reverse()
     mode = 'asc'
     
-  paginator = Paginator(data_list, PAGE_SIZE)
+  paginator = Paginator(data_list, page_size)
   page_data = None
   
   def generatePageLink(pageno, newOrderBy=None, newMode=None):
@@ -48,6 +50,9 @@ def paginateContent(pageName, request, data_list, attr_names):
       newMode = mode
     if not newOrderBy:
       newOrderBy = orderby
+   
+    if link_has_params:
+      return pageName+'&page='+str(pageno)+'&orderby='+newOrderBy+'&mode='+newMode
     return pageName+'?page='+str(pageno)+'&orderby='+newOrderBy+'&mode='+newMode
   
   sort_links = {}
@@ -137,8 +142,12 @@ def flights(request):
   )
   
 def flightEdit(request):
+
+  global FLIGHT_EDIT_PAGE_SIZE
+
   backURL = request.GET.get('back', None)
   id = request.GET.get('id', None)
+  
   if not id:
     template = loader.get_template('index.html')
     context = {
@@ -157,11 +166,21 @@ def flightEdit(request):
     return HttpResponse(template.render(context, request))
     
   template = loader.get_template('index.html')
-  context = {
+ 
+  flight_tickets = flight.tickets.all()
+  context = paginateContent('flight-edit?'+urlencode({
+    'back': backURL,
+    'id': id
+  }), request, flight.tickets.all(), [
+    'name',
+    'surname'
+  ], page_size=FLIGHT_EDIT_PAGE_SIZE, link_has_params=True)
+  
+  context.update({
     'content': 'flight-edit',
     'flight': flight,
     'back_button': backURL
-  }
+  })
   return HttpResponse(template.render(context, request))
   
 
