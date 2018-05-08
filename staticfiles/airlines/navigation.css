@@ -95,6 +95,13 @@ button {
   margin-top: 1vw;
 }
 
+button.small {
+  padding-left: 0.5vw;
+  padding-right: 0.5vw;
+  font-size: 72%;
+  margin-right: 20px;
+}
+
 button:hover {
   background-color: white;
   color: #4c2b2e;

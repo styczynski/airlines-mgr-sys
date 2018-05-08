@@ -1,0 +1,25 @@
+.messagesContainer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  pointer-events: none;
+}
+
+.messagesContainer .message {
+  font-family: 'PT Sans', sans-serif;
+  color: #272222d6;
+  background-color: #0761006b;
+  padding: 1vw;
+  margin-left: 30vw;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  width: 200vw;
+  pointer-events: bounding-box;
+}
+
+.messagesContainer .message.error {
+  background-color: #8e0000c2;
+  color: white;
+}

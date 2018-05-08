@@ -214,7 +214,7 @@ var SortableTable = {};
           
           var context = clickedElement.data('context');
           if(!context) {
-            context = {};
+            context = null;
           }
           
           handler(rowData, table, context);

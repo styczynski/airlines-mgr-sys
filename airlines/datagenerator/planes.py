@@ -24,7 +24,7 @@ airports = [
   'Bern'
 ]
 
-surnames = [
+names = [
   'Adam',
   'Małgorzata',
   'Jan',
@@ -55,7 +55,7 @@ surnames = [
   'Michalina'
 ]
 
-names = [
+surnames = [
   'Kowalski',
   'Kowalczyk',
   'Śmigły',

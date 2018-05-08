@@ -3,9 +3,13 @@ from django.template import loader
 from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.http import urlencode
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.http import urlquote
 
 from .models import Plane, Flight, User
-from .forms import DataGeneratorForm
+from .forms import DataGeneratorForm, AddUserFlightForm
 from .datagenerator.planes import PlanesGenerator
 
 DEFAULT_PAGE_SIZE     = 30
@@ -167,23 +171,119 @@ def flightEdit(request):
     
   template = loader.get_template('index.html')
  
-  flight_tickets = flight.tickets.all()
-  context = paginateContent('flight-edit?'+urlencode({
+  urlParams = urlencode({
     'back': backURL,
     'id': id
-  }), request, flight.tickets.all(), [
-    'name',
-    'surname'
+  })
+  currentURL = 'flight-edit?' + urlParams
+ 
+  flight_tickets = flight.tickets.all()
+  context = paginateContent(currentURL, request, flight.tickets.all(), [
+    'surname',
+    'name'
   ], page_size=FLIGHT_EDIT_PAGE_SIZE, link_has_params=True)
   
   context.update({
     'content': 'flight-edit',
     'flight': flight,
-    'back_button': backURL
+    'back_button': backURL,
+    'add_user_button': 'flight-add-user-flight?' + urlencode({
+      'flightid': str(id),
+      'back': urlParams
+    }),
+    'flight_fullness': ((flight_tickets.count() / flight.plane.seats_count * 10000) // 100)
   })
+  
+  page_data = context['page_data']
+  context['page_data'] = [
+    {
+      'action_cancel': 'flight-cancel-user-flight?' + urlencode({
+        'flightid': str(id),
+        'userid': str(user.id),
+        'back': urlParams
+      }),
+      'data': user
+    } for user in page_data
+  ]
+  
   return HttpResponse(template.render(context, request))
   
+def cancelUserFlight(request):
+  flightid = request.GET.get('flightid', None)
+  userid = request.GET.get('userid', None)
+  backURL = request.GET.get('back', '')
+  
+  flight = Flight.objects.get(id=flightid)
+  user = User.objects.get(id=userid) 
+  flight.tickets.remove(user)
+  flight.save()
+  
+  template = loader.get_template('index.html')
+  context = {}
+  messageOtps = 'info=' + urlquote('The flight of user '+user.name+' '+user.surname+' was cancelled.')
+  return redirect(reverse('flightEdit') + '?' + messageOtps + '&' + backURL)
 
+def addUserFlight(request):
+
+  backURL = request.GET.get('back', '')
+  flightid = request.GET.get('flightid', None)
+  messageOtps = ''
+  
+  template = loader.get_template('index.html')
+  context = {
+    'content': 'add-user-form',
+    'form': None
+  }
+  
+  formActionURL = 'flight-add-user-flight?' + urlencode({
+    'back': backURL,
+    'flightid': flightid
+  })
+  
+  def formDefaultRedirect():
+    return redirect(reverse('flightEdit') + '?' + messageOtps + '&' + backURL)
+  
+  if request.method == 'POST':
+    form = AddUserFlightForm(request.POST)
+    if form.is_valid():
+      context['content'] = 'add-user-form'
+      form_data = form.cleaned_data
+      
+      user_name = form_data['user_name']
+      user_surname = form_data['user_surname']
+      
+      try:
+        flight = Flight.objects.get(id=flightid)
+      except ObjectDoesNotExist:
+        messageOtps = 'error=' + urlquote('The flight of given ID could not be found!')
+        return formDefaultRedirect()
+      
+      if flight.tickets.count() >= flight.plane.seats_count:
+        messageOtps = 'error=' + urlquote('The flight is full. Could not add new passanger.')
+        return formDefaultRedirect()
+      
+      user = None
+      try:
+        user = User.objects.get(name=user_name, surname=user_surname)
+        messageOtps = 'info=' + urlquote('The existing user was added to the flight.')
+      except ObjectDoesNotExist:
+        user = User(name=user_name, surname=user_surname)
+        user.save()
+        messageOtps = 'info=' + urlquote('New user was added to the flight.')
+      
+      flight.tickets.add(user)
+      flight.save()
+      
+      return formDefaultRedirect()
+      
+  else:
+    form = AddUserFlightForm()
+   
+  context['form'] = form
+  context['formActionURL'] = formActionURL
+  return HttpResponse(template.render(context, request))
+
+  
 def planes(request):
   data_list = Plane.objects.annotate(number_of_flights=Count('flight'))
   return renderContentPage(
@@ -233,7 +333,7 @@ def dataGenerator(request):
     #  'plane_reg_format': 'CCCNNNNNN'
     #})
     form = DataGeneratorForm(initial={
-      'users_count': 5000,
+      'users_count': 1000,
       'planes_count': 60,
       'plane_seats_count_min': 11,
       'plane_seats_count_max': 450,

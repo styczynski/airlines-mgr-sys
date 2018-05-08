@@ -1,3 +1,4 @@
+from .models import Plane, Flight, User
 from django import forms
 
 class DataGeneratorForm(forms.Form):
@@ -11,3 +12,7 @@ class DataGeneratorForm(forms.Form):
     ('CCCNNNNNN', '3-letter 6-digit registration'),
     ('........', '8-character hash'),
   ])
+  
+class AddUserFlightForm(forms.Form):
+  user_name =forms.CharField(label='User surname')
+  user_surname =forms.CharField(label='User name')

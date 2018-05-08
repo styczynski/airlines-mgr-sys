@@ -19,7 +19,8 @@ $(document).ready(function(){
     })
     .sortableTable('view')
     .sortableTable('rowClick', function(row, table, context) {
-      console.log(context);
-      window.location = 'flight-edit?id='+context+'&back='+encodeURIComponent(window.location);
+      if(context) {
+        window.location = 'flight-edit?id='+context+'&back='+encodeURIComponent(window.location);
+      }
     });
 });

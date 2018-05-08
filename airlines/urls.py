@@ -11,6 +11,8 @@ urlpatterns = [
   path('flight-edit', views.flightEdit, name='flightEdit'),
   path('data-generator', views.dataGenerator, name='dataGenerator'),
   path('admin-popup', views.adminPopup, name='adminPopup'),
+  path('flight-cancel-user-flight', views.cancelUserFlight, name='cancelUserFlight'),
+  path('flight-add-user-flight', views.addUserFlight, name='addUserFlight'),
   path('data-generator-popup', views.dataGeneratorPopup, name='dataGeneratorPopup'),
 ]
 

@@ -26,7 +26,7 @@
      
     <tr>
       <td>Bought tickets</td>
-      <td>{{ flight.tickets.count }} / {{ flight.plane.seats_count }}</td>
+      <td>{{ flight.tickets.count }} / {{ flight.plane.seats_count }}  <i>({{ flight_fullness }}% sold)</i></td>
     </tr>
     
   </tbody>
@@ -58,10 +58,16 @@
       {% for user in page_data %}
         <tr>
           <td>
-            {{ user.surname }}
+            <a href="{{ user.action_cancel }}">
+              <button class="small">
+                 <i class="fas fa-ban"></i>
+                 Cancel
+              </button>
+            </a>
+            {{ user.data.surname }}
           </td>
           <td>
-            {{ user.name }}
+            {{ user.data.name }}
           </td>
         </tr>
       {% endfor %}
@@ -121,6 +127,14 @@
   <a href="{{ back_button }}">
     <button class="backButton">
       &lt; Go back
+    </button>
+  </a>
+{% endif %}
+
+{% if add_user_button %}
+  <a href="{{ add_user_button }}">
+    <button class="backButton">
+      Add new passanger
     </button>
   </a>
 {% endif %}
