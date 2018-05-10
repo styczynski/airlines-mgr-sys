@@ -75,3 +75,22 @@ table tbody tr td code {
   font-size: 76%;
   font-weight: bold;
 }
+
+table.small select {
+  display: inline-block;
+}
+
+input.small {
+  padding: 0.3vw !important;
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  width: 100%;
+}
+
+table.small th {
+  padding-left: 50px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: rgba(249, 195, 200, 0.0784313725490196);
+  border-bottom: 1px #975259 solid;
+}

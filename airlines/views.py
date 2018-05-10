@@ -11,13 +11,13 @@ from django.utils.http import urlquote, urlunquote
 import json
 
 from .models import Plane, Flight, User
-from .forms import DataGeneratorForm, AddUserFlightForm
+from .forms import DataGeneratorForm, AddUserFlightForm, FilterFlightsForm
 from .datagenerator.planes import PlanesGenerator
 
 DEFAULT_PAGE_SIZE     = 30
 FLIGHT_EDIT_PAGE_SIZE = 15
 
-def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, currentPageRequest=None, doNotGenerateBack=False, proxyBack=False, backParams=None):
+def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, currentPageRequest=None, doNotGenerateBack=False, proxyBack=False, backParams=None, passAttrs=False):
     if not currentPageParams:
         if currentPageRequest:
             currentPageParams =  currentPageRequest.GET.dict()
@@ -46,6 +46,12 @@ def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, cu
 
     currentPageParamsDup.pop('back-params', None)
     currentPageParamsDup.pop('back', None)
+
+    if passAttrs:
+        pageAttrs = {
+            **currentPageParams,
+            **pageAttrs
+        }
 
     currentPageParams = currentPageParamsDup
 
@@ -249,6 +255,39 @@ def renderContentPage(pageName, request, data_list, attr_list, mapping=None):
 
 def flights(request):
 
+  filter_date_from = request.GET.get('date-from', None)
+  filter_date_to = request.GET.get('date-to', None)
+
+
+  formActionURL = argurl(
+      None,
+      {},
+      currentPageRequest=request,
+      passAttrs=True
+  )
+
+  filter_form = None
+
+  if request.method == 'POST':
+    filter_form = FilterFlightsForm(request.POST)
+    if filter_form.is_valid():
+      form_data = filter_form.cleaned_data
+      filtered_url = argurl(
+        None,
+        {
+            'date-from': form_data['from_date'],
+            'date-to': form_data['to_date']
+        },
+        currentPageRequest=request,
+        passAttrs=True
+      )
+      return redirect(filtered_url)
+  else:
+    filter_form = FilterFlightsForm(initial={
+        'from_date': filter_date_from,
+        'to_date': filter_date_to
+    })
+
   def mapFlightData(context):
       if 'page_data' in context:
           page_data = []
@@ -267,9 +306,18 @@ def flights(request):
                 )
               })
           context['page_data'] = page_data
+      context['filter_form'] = filter_form
+      context['filter_action_url'] = formActionURL
       return context
 
   data_list = Flight.objects.annotate(number_of_tickets=Count('tickets'))
+
+  if filter_date_from:
+      data_list = data_list.filter(start__gte=filter_date_from)
+
+  if filter_date_to:
+      data_list = data_list.filter(end__lte=filter_date_to)
+
   return renderContentPage(
     'flights',
     request,

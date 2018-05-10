@@ -10,6 +10,14 @@ a {
 form input, select {
   font-family: 'PT Sans', sans-serif;
   display: block;
+  background-color: #975259;
+  color: white;
+  border: none;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 80%;
+  padding: 5px;
 }
 
 form label {

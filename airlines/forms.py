@@ -12,7 +12,11 @@ class DataGeneratorForm(forms.Form):
     ('CCCNNNNNN', '3-letter 6-digit registration'),
     ('........', '8-character hash'),
   ])
-  
+
 class AddUserFlightForm(forms.Form):
   user_name =forms.CharField(label='User surname')
   user_surname =forms.CharField(label='User name')
+
+class FilterFlightsForm(forms.Form):
+  from_date = forms.DateField(widget=forms.SelectDateWidget())
+  to_date = forms.DateField(widget=forms.SelectDateWidget())
