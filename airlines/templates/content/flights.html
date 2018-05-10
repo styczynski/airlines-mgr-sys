@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <th data-view="plane-plate">
-        <a 
+        <a
           class="{{ sort_links.plane__reg_id.mode }}"
           href="{{ sort_links.plane__reg_id.link }}"
         >
@@ -10,7 +10,7 @@
         </a>
       </th>
       <th>
-        <a 
+        <a
           class="{{ sort_links.src.mode }}"
           href="{{ sort_links.src.link }}"
         >
@@ -18,7 +18,7 @@
         </a>
       </th>
       <th>
-        <a 
+        <a
           class="{{ sort_links.dest.mode }}"
           href="{{ sort_links.dest.link }}"
         >
@@ -26,7 +26,7 @@
         </a>
       </th>
       <th data-type="date" data-input="X" data-view="from-now">
-        <a 
+        <a
           class="{{ sort_links.start.mode }}"
           href="{{ sort_links.start.link }}"
         >
@@ -63,14 +63,14 @@
 
     {% if page_data %}
       {% for flight in page_data %}
-        <tr data-context="{{ flight.id }}">
-            <td>{{ flight.plane.reg_id }}</td>
+        <tr data-context="{{ flight.flight_link }}">
+            <td>{{ flight.plane_reg_id }}</td>
             <td>{{ flight.src }}</td>
             <td>{{ flight.dest }}</td>
             <td>{{ flight.start|date:"U" }}</td>
             <td>{{ flight.end|date:"U" }}</td>
-            <td>{{ flight.plane.seats_count }}</td>
-            <td>{{ flight.tickets.count }}</td>
+            <td>{{ flight.seats_count }}</td>
+            <td>{{ flight.tickets_count }}</td>
         </tr>
       {% endfor %}
     {% else %}

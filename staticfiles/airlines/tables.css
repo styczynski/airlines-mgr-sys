@@ -17,7 +17,7 @@ table thead {
 }
 
 table thead tr {
-  
+
 }
 
 table thead th {
@@ -68,10 +68,10 @@ table tbody tr:hover {
 }
 
 table tbody tr td code {
-  background: #e6d79e59;
+  background: rgba(230,215,158,0.349);
   padding: 5px;
   border: 1px solid #cca8a8;
-  font-family: Consolas;
+  font-family: 'PT Sans', sans-serif;
   font-size: 76%;
   font-weight: bold;
 }

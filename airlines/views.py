@@ -7,7 +7,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import NoReverseMatch
-from django.utils.http import urlquote
+from django.utils.http import urlquote, urlunquote
+import json
 
 from .models import Plane, Flight, User
 from .forms import DataGeneratorForm, AddUserFlightForm
@@ -19,7 +20,7 @@ FLIGHT_EDIT_PAGE_SIZE = 15
 def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, currentPageRequest=None, doNotGenerateBack=False, proxyBack=False, backParams=None):
     if not currentPageParams:
         if currentPageRequest:
-            currentPageParams =  currentPageRequest.GET
+            currentPageParams =  currentPageRequest.GET.dict()
     if not currentPageName:
         if currentPageRequest:
             currentPageName = currentPageRequest.resolver_match.view_name
@@ -50,7 +51,7 @@ def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, cu
 
     backs = {
         # TODO: Switch this to quote bacouse it should be then unquoted :(
-        'back-params': urlencode(currentPageParams),
+        'back-params': urlquote(json.dumps(currentPageParams)),
         'back': currentPageName
     }
 
@@ -90,23 +91,28 @@ def getBackURL(request, params={}, proxyBack=False):
     print(request.GET)
     backURL = request.GET.get('back', None)
     backParams = request.GET.get('back-params', None)
+    if backParams:
+        backParams = json.loads(urlunquote(backParams))
+    else:
+        backParams = {}
+
     if proxyBack:
         return argurl(
             backURL,
             {
+                **backParams,
                 **params
             },
             proxyBack=True,
-            backParams=backParams,
             currentPageRequest=request
         )
     return argurl(
         backURL,
         {
+            **backParams,
             **params
         },
         doNotGenerateBack=True,
-        backParams=backParams,
         currentPageRequest=request
     )
 
@@ -231,15 +237,38 @@ def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_si
     'page_data': page_data
   }
 
-def renderContentPage(pageName, request, data_list, attr_list):
+def renderContentPage(pageName, request, data_list, attr_list, mapping=None):
   context = paginateContent(pageName, {}, request, data_list, attr_list)
   template = loader.get_template('index.html')
   context.update({
     'content': pageName
   })
+  if mapping:
+      context = mapping(context)
   return HttpResponse(template.render(context, request))
 
 def flights(request):
+
+  def mapFlightData(context):
+      if 'page_data' in context:
+          page_data = []
+          for flight in context['page_data']:
+              page_data.append({
+                **vars(flight),
+                'seats_count': flight.plane.seats_count,
+                'tickets_count': flight.tickets.count,
+                'plane_reg_id': flight.plane.reg_id,
+                'flight_link': argurl(
+                    'flightEdit',
+                    {
+                      'id': str(flight.id)
+                    },
+                    currentPageRequest=request
+                )
+              })
+          context['page_data'] = page_data
+      return context
+
   data_list = Flight.objects.annotate(number_of_tickets=Count('tickets'))
   return renderContentPage(
     'flights',
@@ -249,7 +278,8 @@ def flights(request):
       'plane__reg_id', 'src', 'dest',
       'start', 'end', 'plane__seats_count',
       'number_of_tickets'
-    ]
+    ],
+    mapping=mapFlightData
   )
 
 def flightEdit(request):

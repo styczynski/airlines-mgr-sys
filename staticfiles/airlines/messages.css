@@ -8,8 +8,8 @@
 
 .messagesContainer .message {
   font-family: 'PT Sans', sans-serif;
-  color: #272222d6;
-  background-color: #0761006b;
+  color: rgba(39,34,34,0.839);
+  background-color: rgba(7,97,0,0.419);
   padding: 1vw;
   margin-left: 30vw;
   font-weight: bold;
@@ -20,6 +20,6 @@
 }
 
 .messagesContainer .message.error {
-  background-color: #8e0000c2;
+  background-color: rgba(142,0,0,0.76);
   color: white;
 }
