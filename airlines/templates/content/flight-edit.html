@@ -58,12 +58,14 @@
       {% for user in page_data %}
         <tr>
           <td>
-            <a href="{{ user.action_cancel }}">
-              <button class="small">
-                 <i class="fas fa-ban"></i>
-                 Cancel
-              </button>
-            </a>
+            {% if user_auth %}
+              <a href="{{ user.action_cancel }}">
+                <button class="small">
+                   <i class="fas fa-ban"></i>
+                   Cancel
+                </button>
+              </a>
+            {% endif %}
             {{ user.data.surname }}
           </td>
           <td>
@@ -131,10 +133,12 @@
   </a>
 {% endif %}
 
-{% if add_user_button %}
-  <a href="{{ add_user_button }}">
-    <button class="backButton">
-      Add new passanger
-    </button>
-  </a>
+{% if user_auth %}
+  {% if add_user_button %}
+    <a href="{{ add_user_button }}">
+      <button class="backButton">
+        Add new passanger
+      </button>
+    </a>
+  {% endif %}
 {% endif %}

@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import NoReverseMatch
 from django.utils.http import urlquote, urlunquote
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 import json
 
 from .models import Plane, Flight, User
@@ -17,7 +19,7 @@ from .datagenerator.planes import PlanesGenerator
 DEFAULT_PAGE_SIZE     = 30
 FLIGHT_EDIT_PAGE_SIZE = 15
 
-def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, currentPageRequest=None, doNotGenerateBack=False, proxyBack=False, backParams=None, passAttrs=False):
+def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, currentPageRequest=None, doNotGenerateBack=False, proxyBack=False, backParams=None, passAttrs=False, passExcept=None):
     if not currentPageParams:
         if currentPageRequest:
             currentPageParams =  currentPageRequest.GET.dict()
@@ -48,10 +50,21 @@ def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, cu
     currentPageParamsDup.pop('back', None)
 
     if passAttrs:
-        pageAttrs = {
-            **currentPageParams,
+        if not passExcept:
+          pageAttrs = {
+              **currentPageParams,
+              **pageAttrs
+          }
+        else:
+          pageAttrsNew = {}
+          for k, v in currentPageParams.items():
+            if k not in passExcept:
+              pageAttrsNew[k] = v
+          pageAttrs = {
+            **pageAttrsNew,
             **pageAttrs
-        }
+          }
+          
 
     currentPageParams = currentPageParamsDup
 
@@ -249,10 +262,18 @@ def renderContentPage(pageName, request, data_list, attr_list, mapping=None):
   context.update({
     'content': pageName
   })
+  if request.user.is_authenticated:
+    context.update({
+      'user_auth': request.user
+    })
+  else:
+    context.update({
+      'user_auth': None
+    })
   if mapping:
       context = mapping(context)
   return HttpResponse(template.render(context, request))
-
+  
 def flights(request):
 
   filter_date_from = request.GET.get('date-from', None)
@@ -263,7 +284,11 @@ def flights(request):
       None,
       {},
       currentPageRequest=request,
-      passAttrs=True
+      passAttrs=True,
+      passExcept=[
+        'date-from',
+        'date-to'
+      ]
   )
 
   filter_form = None
@@ -272,12 +297,16 @@ def flights(request):
     filter_form = FilterFlightsForm(request.POST)
     if filter_form.is_valid():
       form_data = filter_form.cleaned_data
+      
+      urlParams = {}
+      if form_data['from_date']:
+        urlParams['date-from'] = form_data['from_date']
+      if form_data['to_date']:
+        urlParams['date-to'] = form_data['to_date']
+      
       filtered_url = argurl(
         None,
-        {
-            'date-from': form_data['from_date'],
-            'date-to': form_data['to_date']
-        },
+        urlParams,
         currentPageRequest=request,
         passAttrs=True
       )
@@ -374,7 +403,16 @@ def flightEdit(request):
     }, currentPageRequest=request),
     'flight_fullness': ((flight_tickets.count() / flight.plane.seats_count * 10000) // 100)
   })
-
+  
+  if request.user.is_authenticated:
+    context.update({
+      'user_auth': request.user
+    })
+  else:
+    context.update({
+      'user_auth': None
+    })
+  
   page_data = context['page_data']
   context['page_data'] = [
     {
@@ -388,6 +426,7 @@ def flightEdit(request):
 
   return HttpResponse(template.render(context, request))
 
+@login_required
 def cancelUserFlight(request):
   flightid = request.GET.get('flightid', None)
   userid = request.GET.get('userid', None)
@@ -405,6 +444,7 @@ def cancelUserFlight(request):
   }, proxyBack=True)
   return redirect(backURL)
 
+@login_required
 def addUserFlight(request):
 
   backURL = getBackURL(request, proxyBack=True)
@@ -504,6 +544,7 @@ def users(request):
     ]
   )
 
+@login_required
 def dataGenerator(request):
   template = loader.get_template('data-generator.html')
   context = {
@@ -548,7 +589,7 @@ def dataGenerator(request):
   #}
   #return HttpResponse(template.render(context, request))
 
-
+@login_required
 def dataGeneratorPopup(request):
   template = loader.get_template('popups/data-generator.html')
   context = {
@@ -556,6 +597,7 @@ def dataGeneratorPopup(request):
   }
   return HttpResponse(template.render(context, request))
 
+@login_required
 def adminPopup(request):
   template = loader.get_template('popups/admin.html')
   context = {
@@ -564,4 +606,8 @@ def adminPopup(request):
   return HttpResponse(template.render(context, request))
 
 def index(request):
-  return flights(request)
+  template = loader.get_template('index.html')
+  context = {
+    'content': 'home'
+  }
+  return HttpResponse(template.render(context, request))

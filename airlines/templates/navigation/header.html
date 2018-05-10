@@ -1,19 +1,37 @@
 <header>
   <i class="fas fa-plane"></i> Airlines manager
+  <nav>
+    {% if user_auth %}
+      Logged as <span class="username">{{ user_auth.username }}</span>
+      <a href="logout">
+        <button class="small">
+          Logout
+        </button>
+      </a>
+    {% else %}
+      <a href="login">
+        <button class="small">
+          Login to system
+        </button>
+      </a>
+    {% endif %}
+  </nav>
 </header>
 <nav>
   <ul>
-    <li>
-      <a class="popup" href="admin-popup">
-        <i class="fas fa-unlock-alt"></i>
-        Administration
-      </a>
-    </li>
-    <li>
-      <a class="popup" href="data-generator-popup">
-        <i class="fas fa-cubes"></i>
-        Data generator
-      </a>
-    </li>
+    {% if user_auth %}
+      <li>
+        <a class="popup" href="admin-popup">
+          <i class="fas fa-unlock-alt"></i>
+          Administration
+        </a>
+      </li>
+      <li>
+        <a class="popup" href="data-generator-popup">
+          <i class="fas fa-cubes"></i>
+          Data generator
+        </a>
+      </li>
+    {% endif %}
   </ul>
 </nav>

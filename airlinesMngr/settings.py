@@ -131,3 +131,5 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
+
+LOGIN_REDIRECT_URL = '/airlines/'

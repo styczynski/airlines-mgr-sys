@@ -18,5 +18,5 @@ class AddUserFlightForm(forms.Form):
   user_surname =forms.CharField(label='User name')
 
 class FilterFlightsForm(forms.Form):
-  from_date = forms.DateField(widget=forms.SelectDateWidget())
-  to_date = forms.DateField(widget=forms.SelectDateWidget())
+  from_date = forms.DateField(required=False, widget=forms.SelectDateWidget())
+  to_date = forms.DateField(required=False, widget=forms.SelectDateWidget())

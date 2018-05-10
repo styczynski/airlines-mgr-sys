@@ -1,10 +1,17 @@
 body {
   margin: 0;
   padding: 0;
+  /*filter: hue-rotate(191deg) brightness(98%) contrast(98%) saturate(74%);*/
 }
 
 a {
   text-decoration: none;
+}
+
+h1 {
+  font-family: 'PT Sans', sans-serif;
+  color: black;
+  margin-left: 1vw;
 }
 
 form input, select {
@@ -53,11 +60,22 @@ body > header {
   margin: 0;
   padding-top: 3vw;
   padding-bottom: 1vw;
+  user-select: none;
 }
 
 body > header i {
   margin-right: 1vw;
   margin-left: 2vw;
+}
+
+body > header > nav {
+  font-size: 50%;
+  float: right;
+  margin-right: 1vw;
+}
+
+body > header > nav span.username {
+  text-decoration: underline;
 }
 
 body > nav {

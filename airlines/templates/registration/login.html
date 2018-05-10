@@ -26,13 +26,8 @@
         <link rel="stylesheet" href="{% static 'airlines/messages.css' %}">
         <link rel="stylesheet" href="{% static 'airlines/login.css' %}">
         <link rel="stylesheet" href="{% static 'airlines/forms.css' %}">
-        <link rel="stylesheet" href="{% static 'airlines/home.css' %}">
     </head>
-    {% if content == 'home' %}
-      <body class="home">
-    {% else %}
-      <body>
-    {% endif %}
+    <body>
     
       {% include "navigation/header.html" %}
         
@@ -41,27 +36,16 @@
           {% include "navigation/navigation.html" %}
         </nav>
       
-        {% if content == 'home' %}
-          {% include "content/home.html" %}
-        {% endif %}
-        {% if content == 'add-user-form' %}
-          {% include "content/add-user-form.html" %}
-        {% endif %}
-        {% if content == 'flight-edit-not-found' %}
-          {% include "content/flight-edit-not-found.html" %}
-        {% endif %}
-        {% if content == 'flight-edit' %}
-          {% include "content/flight-edit.html" %}
-        {% endif %}
-        {% if content == 'flights' %}
-          {% include "content/flights.html" %}
-        {% endif %}
-        {% if content == 'planes' %}
-          {% include "content/planes.html" %}
-        {% endif %}
-        {% if content == 'users' %}
-          {% include "content/users.html" %}
-        {% endif %}
+        {% block content %}
+          <h1>
+            Enter your login data
+          </h1>
+          <form class="login" method="post">
+            {% csrf_token %}
+            {{ form.as_table }}
+            <button type="submit">Login</button>
+          </form>
+        {% endblock %}
       </main>
       
       {% include "navigation/footer.html" %}
