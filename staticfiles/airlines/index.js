@@ -20,7 +20,8 @@ $(document).ready(function(){
     .sortableTable('view')
     .sortableTable('rowClick', function(row, table, context) {
       if(context) {
-        window.location = 'flight-edit?id='+context+'&back='+encodeURIComponent(window.location);
+        //window.location = 'flight-edit?id='+context+'&back='+encodeURIComponent(window.location);
+        window.location = 'flight-edit?id='+context+'&back=flightEdit';
       }
     });
 });

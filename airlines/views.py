@@ -6,6 +6,7 @@ from django.utils.http import urlencode
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import NoReverseMatch
 from django.utils.http import urlquote
 
 from .models import Plane, Flight, User
@@ -15,10 +16,104 @@ from .datagenerator.planes import PlanesGenerator
 DEFAULT_PAGE_SIZE     = 30
 FLIGHT_EDIT_PAGE_SIZE = 15
 
-def paginateContent(pageName, request, data_list, attr_names, page_size=DEFAULT_PAGE_SIZE, link_has_params=False):
-  
+def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, currentPageRequest=None, doNotGenerateBack=False, proxyBack=False, backParams=None):
+    if not currentPageParams:
+        if currentPageRequest:
+            currentPageParams =  currentPageRequest.GET
+    if not currentPageName:
+        if currentPageRequest:
+            currentPageName = currentPageRequest.resolver_match.view_name
+    if not pageName:
+        pageName = currentPageName
+
+    reverseURL = '/'
+    try:
+        reverseURL = reverse(pageName)
+    except NoReverseMatch:
+        reverseURL = pageName
+
+    if not currentPageParams:
+        currentPageParams = {}
+
+    currentPageParamsDup = {
+        **currentPageParams
+    }
+
+
+    previousBackParams = currentPageParams.get('back-params', '')
+    previousBack = currentPageParams.get('back', '')
+
+    currentPageParamsDup.pop('back-params', None)
+    currentPageParamsDup.pop('back', None)
+
+    currentPageParams = currentPageParamsDup
+
+    backs = {
+        # TODO: Switch this to quote bacouse it should be then unquoted :(
+        'back-params': urlencode(currentPageParams),
+        'back': currentPageName
+    }
+
+    if not proxyBack:
+        if doNotGenerateBack:
+            backs = {}
+
+    if not reverseURL.endswith('?'):
+        reverseURL = reverseURL + '?'
+
+    if proxyBack:
+        backs = {
+            'back-params': previousBackParams,
+            'back': previousBack
+        }
+
+    if backParams:
+        if not (reverseURL.endswith('?') or reverseURL.endswith('&')):
+            reverseURL = reverseURL + '&'
+        reverseURL = reverseURL + backParams
+        if not (reverseURL.endswith('?') or reverseURL.endswith('&')):
+            reverseURL = reverseURL + '&'
+
+    print('GENRATED URL')
+    print(reverseURL + urlencode({
+        **pageAttrs,
+        **backs
+    }))
+
+    return reverseURL + urlencode({
+        **pageAttrs,
+        **backs
+    })
+
+def getBackURL(request, params={}, proxyBack=False):
+    print("GET_BACK_URL")
+    print(request.GET)
+    backURL = request.GET.get('back', None)
+    backParams = request.GET.get('back-params', None)
+    if proxyBack:
+        return argurl(
+            backURL,
+            {
+                **params
+            },
+            proxyBack=True,
+            backParams=backParams,
+            currentPageRequest=request
+        )
+    return argurl(
+        backURL,
+        {
+            **params
+        },
+        doNotGenerateBack=True,
+        backParams=backParams,
+        currentPageRequest=request
+    )
+
+def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_size=DEFAULT_PAGE_SIZE):
+
   global DEFAULT_PAGE_SIZE
-  
+
   page = request.GET.get('page', 1)
   orderby = request.GET.get('orderby', '')
   mode = request.GET.get('mode', '')
@@ -26,7 +121,7 @@ def paginateContent(pageName, request, data_list, attr_names, page_size=DEFAULT_
   previous_page = None
   first_page = None
   last_page = None
-  
+
   orderby_attr_found = False
   for attr in attr_names:
     if orderby == attr:
@@ -35,7 +130,7 @@ def paginateContent(pageName, request, data_list, attr_names, page_size=DEFAULT_
       break
   if not orderby_attr_found:
     orderby = attr_names[0]
-  
+
   if mode == 'asc':
     data_list = data_list.reverse()
   elif mode == 'desc':
@@ -43,33 +138,45 @@ def paginateContent(pageName, request, data_list, attr_names, page_size=DEFAULT_
   else:
     data_list = data_list.reverse()
     mode = 'asc'
-    
+
   paginator = Paginator(data_list, page_size)
   page_data = None
-  
-  def generatePageLink(pageno, newOrderBy=None, newMode=None):
+
+  def generatePageLink(pageno, newOrderBy=None, newMode=None, doNotGenerateBack=False):
     if not pageno:
       return None
     if not newMode:
       newMode = mode
     if not newOrderBy:
       newOrderBy = orderby
-   
-    if link_has_params:
-      return pageName+'&page='+str(pageno)+'&orderby='+newOrderBy+'&mode='+newMode
-    return pageName+'?page='+str(pageno)+'&orderby='+newOrderBy+'&mode='+newMode
-  
+
+    #if link_has_params:
+    #  return pageName+'&page='+str(pageno)+'&orderby='+newOrderBy+'&mode='+newMode
+    #return pageName+'?page='+str(pageno)+'&orderby='+newOrderBy+'&mode='+newMode
+
+    return argurl(
+        None,
+        {
+            **pageAttrs,
+            'page': str(pageno),
+            'orderby': newOrderBy,
+            'mode': newMode
+        },
+        currentPageRequest=request,
+        doNotGenerateBack=doNotGenerateBack
+    )
+
   sort_links = {}
   for attr in attr_names:
     sort_links[attr] = {
-      'link': generatePageLink(page, attr, 'desc'),
+      'link': generatePageLink(page, attr, 'desc', doNotGenerateBack=True),
       'mode': ''
     }
-  
+
   if orderby in sort_links:
     sort_links[orderby]['mode'] = 'sort-'+mode
     if mode == 'desc':
-      sort_links[orderby]['link'] = generatePageLink(page, orderby, 'asc')
+      sort_links[orderby]['link'] = generatePageLink(page, orderby, 'asc', doNotGenerateBack=True)
 
   try:
     page_data = paginator.page(page)
@@ -91,28 +198,28 @@ def paginateContent(pageName, request, data_list, attr_names, page_size=DEFAULT_
     first_page = 1
   if page != paginator.num_pages:
     last_page = paginator.num_pages
-    
+
   pages = [
     {
       'link': generatePageLink(pageno),
       'no': pageno
     } for pageno in paginator.page_range
   ]
-    
+
   pages_range = 5
   pages_min = page-pages_range
   if pages_min < 0:
     pages_min = 0
-  
+
   pages_max = page+pages_range
   if pages_max > paginator.num_pages:
     pages_max = paginator.num_pages
-    
+
   pages = pages[pages_min:pages_max]
-    
+
   if len(pages) <= 1:
     pages = None
-    
+
   return {
     'current_page': page,
     'pages': pages,
@@ -123,15 +230,15 @@ def paginateContent(pageName, request, data_list, attr_names, page_size=DEFAULT_
     'sort_links': sort_links,
     'page_data': page_data
   }
-   
+
 def renderContentPage(pageName, request, data_list, attr_list):
-  context = paginateContent(pageName, request, data_list, attr_list)
+  context = paginateContent(pageName, {}, request, data_list, attr_list)
   template = loader.get_template('index.html')
   context.update({
     'content': pageName
   })
   return HttpResponse(template.render(context, request))
-   
+
 def flights(request):
   data_list = Flight.objects.annotate(number_of_tickets=Count('tickets'))
   return renderContentPage(
@@ -144,14 +251,14 @@ def flights(request):
       'number_of_tickets'
     ]
   )
-  
+
 def flightEdit(request):
 
   global FLIGHT_EDIT_PAGE_SIZE
 
-  backURL = request.GET.get('back', None)
+  backURL = getBackURL(request)
   id = request.GET.get('id', None)
-  
+
   if not id:
     template = loader.get_template('index.html')
     context = {
@@ -159,7 +266,7 @@ def flightEdit(request):
       'back_button': backURL
     }
     return HttpResponse(template.render(context, request))
-  
+
   flight = Flight.objects.get(id=id)
   if not flight:
     template = loader.get_template('index.html')
@@ -168,122 +275,133 @@ def flightEdit(request):
       'back_button': backURL
     }
     return HttpResponse(template.render(context, request))
-    
+
   template = loader.get_template('index.html')
- 
-  urlParams = urlencode({
+
+  flight_tickets = flight.tickets.all()
+  context = paginateContent('flight-edit', {
     'back': backURL,
     'id': id
-  })
-  currentURL = 'flight-edit?' + urlParams
- 
-  flight_tickets = flight.tickets.all()
-  context = paginateContent(currentURL, request, flight.tickets.all(), [
+  }, request, flight.tickets.all(), [
     'surname',
     'name'
-  ], page_size=FLIGHT_EDIT_PAGE_SIZE, link_has_params=True)
-  
+  ], page_size=FLIGHT_EDIT_PAGE_SIZE)
+
   context.update({
     'content': 'flight-edit',
     'flight': flight,
     'back_button': backURL,
-    'add_user_button': 'flight-add-user-flight?' + urlencode({
-      'flightid': str(id),
-      'back': urlParams
-    }),
+    'add_user_button': argurl('addUserFlight', {
+      'flightid': str(id)
+    }, currentPageRequest=request),
     'flight_fullness': ((flight_tickets.count() / flight.plane.seats_count * 10000) // 100)
   })
-  
+
   page_data = context['page_data']
   context['page_data'] = [
     {
-      'action_cancel': 'flight-cancel-user-flight?' + urlencode({
+      'action_cancel': argurl('cancelUserFlight', {
         'flightid': str(id),
-        'userid': str(user.id),
-        'back': urlParams
-      }),
+        'userid': str(user.id)
+      }, currentPageRequest=request),
       'data': user
     } for user in page_data
   ]
-  
+
   return HttpResponse(template.render(context, request))
-  
+
 def cancelUserFlight(request):
   flightid = request.GET.get('flightid', None)
   userid = request.GET.get('userid', None)
-  backURL = request.GET.get('back', '')
-  
+  backURL = getBackURL(request, proxyBack=True)
+
   flight = Flight.objects.get(id=flightid)
-  user = User.objects.get(id=userid) 
+  user = User.objects.get(id=userid)
   flight.tickets.remove(user)
   flight.save()
-  
+
   template = loader.get_template('index.html')
   context = {}
-  messageOtps = 'info=' + urlquote('The flight of user '+user.name+' '+user.surname+' was cancelled.')
-  return redirect(reverse('flightEdit') + '?' + messageOtps + '&' + backURL)
+  backURL = getBackURL(request, {
+    'info': urlquote('The flight of user '+user.name+' '+user.surname+' was cancelled.')
+  }, proxyBack=True)
+  return redirect(backURL)
 
 def addUserFlight(request):
 
-  backURL = request.GET.get('back', '')
+  backURL = getBackURL(request, proxyBack=True)
   flightid = request.GET.get('flightid', None)
   messageOtps = ''
-  
+
   template = loader.get_template('index.html')
   context = {
     'content': 'add-user-form',
     'form': None
   }
-  
-  formActionURL = 'flight-add-user-flight?' + urlencode({
-    'back': backURL,
-    'flightid': flightid
-  })
-  
+
+  formActionURL = argurl(
+      None,
+      {
+        'flightid': flightid
+      },
+      currentPageRequest=request,
+      proxyBack=True
+  )
+
   def formDefaultRedirect():
-    return redirect(reverse('flightEdit') + '?' + messageOtps + '&' + backURL)
-  
+    print(backURL)
+    return redirect(backURL)
+
   if request.method == 'POST':
     form = AddUserFlightForm(request.POST)
     if form.is_valid():
       context['content'] = 'add-user-form'
       form_data = form.cleaned_data
-      
+
       user_name = form_data['user_name']
       user_surname = form_data['user_surname']
-      
+
       try:
         flight = Flight.objects.get(id=flightid)
       except ObjectDoesNotExist:
-        messageOtps = 'error=' + urlquote('The flight of given ID could not be found!')
+        backURL = getBackURL(request, {
+            'error': urlquote('The flight of given ID could not be found!')
+        }, proxyBack=True)
         return formDefaultRedirect()
-      
+
       if flight.tickets.count() >= flight.plane.seats_count:
-        messageOtps = 'error=' + urlquote('The flight is full. Could not add new passanger.')
+        backURL = getBackURL(request, {
+            'error': urlquote('The flight is full. Could not add new passanger.')
+        }, proxyBack=True)
         return formDefaultRedirect()
-      
+
       user = None
       try:
         user = User.objects.get(name=user_name, surname=user_surname)
-        messageOtps = 'info=' + urlquote('The existing user was added to the flight.')
+        backURL = getBackURL(request, {
+            'info': urlquote('The existing user was added to the flight.')
+        }, proxyBack=True)
       except ObjectDoesNotExist:
         user = User(name=user_name, surname=user_surname)
         user.save()
-        messageOtps = 'info=' + urlquote('New user was added to the flight.')
-      
+        backURL = getBackURL(request, {
+            'info': urlquote('New user was added to the flight.')
+        }, proxyBack=True)
+
       flight.tickets.add(user)
       flight.save()
-      
+
       return formDefaultRedirect()
-      
+
   else:
     form = AddUserFlightForm()
-   
+
   context['form'] = form
   context['formActionURL'] = formActionURL
+
   return HttpResponse(template.render(context, request))
 
-  
+
 def planes(request):
   data_list = Plane.objects.annotate(number_of_flights=Count('flight'))
   return renderContentPage(
@@ -295,8 +413,8 @@ def planes(request):
       'service_start'
     ]
   )
-  
-  
+
+
 def users(request):
   data_list = User.objects.annotate(number_of_flights=Count('flights'))
   return renderContentPage(
@@ -307,21 +425,21 @@ def users(request):
       'name', 'surname', 'number_of_flights'
     ]
   )
-  
+
 def dataGenerator(request):
   template = loader.get_template('data-generator.html')
   context = {
     'content': 'data-generator',
     'form': None
   }
-  
+
   if request.method == 'POST':
     form = DataGeneratorForm(request.POST)
     if form.is_valid():
       context['content'] = 'data-generator-answer'
       data = PlanesGenerator(Plane, Flight, User, form)
       context['content_message'] = 'Generated '+str(len(data['planes']))+' planes and '+str(len(data['flights']))+' flights'
-      
+
   else:
     #form = DataGeneratorForm(initial={
     #  'users_count': 5,
@@ -341,31 +459,31 @@ def dataGenerator(request):
       'plane_flights_count_max': 18,
       'plane_reg_format': 'CCCNNNNNN'
     })
-   
+
   context['form'] = form
-   
+
   return HttpResponse(template.render(context, request))
-    
+
   #template = loader.get_template('data-generator.html')
   #context = {
   #  'content': 'data-generator'
   #}
   #return HttpResponse(template.render(context, request))
-  
-  
+
+
 def dataGeneratorPopup(request):
   template = loader.get_template('popups/data-generator.html')
   context = {
     'content': 'data-generator'
   }
   return HttpResponse(template.render(context, request))
-  
+
 def adminPopup(request):
   template = loader.get_template('popups/admin.html')
   context = {
     'content': 'admin'
   }
   return HttpResponse(template.render(context, request))
-  
+
 def index(request):
   return flights(request)
