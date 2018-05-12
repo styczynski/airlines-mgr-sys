@@ -29,8 +29,10 @@
 
 .dialogContent {
   width: 100%;
-  height: 100%;
+  height: 42vh;
   margin: 0;
+  overflow: scroll;
+  background: white;
 }
 
 button.mfp-close {
@@ -38,9 +40,9 @@ button.mfp-close {
   color: white !important;
   z-index: 999999999999 !important;
   opacity: 1 !important;
-  top: 16px !important;
+  top: 5px !important;
   right: 6vw !important;
-  height: 66px !important;
+  height: 64px !important;
 }
 
 .dialogContent form input, select {

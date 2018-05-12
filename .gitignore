@@ -1,0 +1,11 @@
+__pycache__
+__pycache__/
+airlines/__pycache__/
+airlinesMngr/__pycache__
+airlinesMngr/__pycache__/
+**/__pycache__/
+**/__pycache__/
+python-env/**
+python-env
+*.rdb
+db.sqlite3

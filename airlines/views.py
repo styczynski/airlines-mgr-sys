@@ -6,10 +6,12 @@ from django.utils.http import urlencode
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import OperationalError
 from django.urls import NoReverseMatch
 from django.utils.http import urlquote, urlunquote
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from background_task import background
 import json
 
 from .models import Plane, Flight, User
@@ -19,7 +21,7 @@ from .datagenerator.planes import PlanesGenerator
 DEFAULT_PAGE_SIZE     = 30
 FLIGHT_EDIT_PAGE_SIZE = 15
 
-def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, currentPageRequest=None, doNotGenerateBack=False, proxyBack=False, backParams=None, passAttrs=False, passExcept=None):
+def argurl(pageName, pageAttrs={}, fullUri=False, uriScheme=None, currentPageName=None, currentPageParams=None, currentPageRequest=None, doNotGenerateBack=False, proxyBack=False, backParams=None, passAttrs=False, passExcept=None):
     if not currentPageParams:
         if currentPageRequest:
             currentPageParams =  currentPageRequest.GET.dict()
@@ -31,7 +33,13 @@ def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, cu
 
     reverseURL = '/'
     try:
-        reverseURL = reverse(pageName)
+      reverseURL = reverse(pageName)
+      if fullUri:
+        if currentPageRequest:
+          scheme = currentPageRequest.scheme
+          if uriScheme:
+            scheme = uriScheme
+          reverseURL =  "{0}://{1}{2}".format(scheme, currentPageRequest.get_host(), reverseURL)
     except NoReverseMatch:
         reverseURL = pageName
 
@@ -41,7 +49,6 @@ def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, cu
     currentPageParamsDup = {
         **currentPageParams
     }
-
 
     previousBackParams = currentPageParams.get('back-params', '')
     previousBack = currentPageParams.get('back', '')
@@ -94,20 +101,12 @@ def argurl(pageName, pageAttrs, currentPageName=None, currentPageParams=None, cu
         if not (reverseURL.endswith('?') or reverseURL.endswith('&')):
             reverseURL = reverseURL + '&'
 
-    print('GENRATED URL')
-    print(reverseURL + urlencode({
-        **pageAttrs,
-        **backs
-    }))
-
     return reverseURL + urlencode({
         **pageAttrs,
         **backs
     })
 
 def getBackURL(request, params={}, proxyBack=False):
-    print("GET_BACK_URL")
-    print(request.GET)
     backURL = request.GET.get('back', None)
     backParams = request.GET.get('back-params', None)
     if backParams:
@@ -135,10 +134,27 @@ def getBackURL(request, params={}, proxyBack=False):
         currentPageRequest=request
     )
 
+
+def useServerStatus(request, context):
+  context.update({
+    'server_status_url': argurl(
+      'serverStatus',
+      doNotGenerateBack=True,
+      currentPageRequest=request,
+      fullUri=True,
+      uriScheme='ws'
+    )
+    
+    #request.build_absolute_uri() + '/server_status' #'ws://localhost:8000/airlines/server_status'
+  })
+
+    
 def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_size=DEFAULT_PAGE_SIZE):
 
   global DEFAULT_PAGE_SIZE
 
+  force_empty_page_data = False
+  
   page = request.GET.get('page', 1)
   orderby = request.GET.get('orderby', '')
   mode = request.GET.get('mode', '')
@@ -168,6 +184,7 @@ def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_si
   page_data = None
 
   def generatePageLink(pageno, newOrderBy=None, newMode=None, doNotGenerateBack=False):
+    
     if not pageno:
       return None
     if not newMode:
@@ -218,31 +235,39 @@ def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_si
     page_data = paginator.page(paginator.num_pages)
     page = paginator.num_pages
     previous_page = page - 1
+  except OperationalError:
+    page_data = []
+    force_empty_page_data = True
+    
+  
+  if not force_empty_page_data:  
+    if page != 1:
+      first_page = 1
+    if page != paginator.num_pages:
+      last_page = paginator.num_pages
 
-  if page != 1:
-    first_page = 1
-  if page != paginator.num_pages:
-    last_page = paginator.num_pages
+  if not force_empty_page_data:
+    pages = [
+      {
+        'link': generatePageLink(pageno),
+        'no': pageno
+      } for pageno in paginator.page_range
+    ]
 
-  pages = [
-    {
-      'link': generatePageLink(pageno),
-      'no': pageno
-    } for pageno in paginator.page_range
-  ]
+    pages_range = 5
+    pages_min = page-pages_range
+    if pages_min < 0:
+      pages_min = 0
 
-  pages_range = 5
-  pages_min = page-pages_range
-  if pages_min < 0:
-    pages_min = 0
+    pages_max = page+pages_range
+    if pages_max > paginator.num_pages:
+      pages_max = paginator.num_pages
 
-  pages_max = page+pages_range
-  if pages_max > paginator.num_pages:
-    pages_max = paginator.num_pages
+    pages = pages[pages_min:pages_max]
 
-  pages = pages[pages_min:pages_max]
-
-  if len(pages) <= 1:
+    if len(pages) <= 1:
+      pages = None
+  else:
     pages = None
 
   return {
@@ -256,24 +281,51 @@ def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_si
     'page_data': page_data
   }
 
+def renderContentTemplate(request, context, template):
+  try:
+    useServerStatus(request, context)
+    if request.user.is_authenticated:
+      context.update({
+        'user_auth': request.user
+      })
+    else:
+      context.update({
+        'user_auth': None
+      })
+  except OperationalError:
+    context.update({
+      'user_auth': None
+    })
+  return HttpResponse(template.render(context, request))
+  
+  
 def renderContentPage(pageName, request, data_list, attr_list, mapping=None):
   context = paginateContent(pageName, {}, request, data_list, attr_list)
   template = loader.get_template('index.html')
   context.update({
     'content': pageName
   })
-  if request.user.is_authenticated:
-    context.update({
-      'user_auth': request.user
-    })
-  else:
+  try:
+    if request.user.is_authenticated:
+      context.update({
+        'user_auth': request.user
+      })
+    else:
+      context.update({
+        'user_auth': None
+      })
+  except OperationalError:
     context.update({
       'user_auth': None
     })
+    
   if mapping:
       context = mapping(context)
-  return HttpResponse(template.render(context, request))
+      
+  useServerStatus(request, context)
+  return renderContentTemplate(request, context, template)
   
+
 def flights(request):
 
   filter_date_from = request.GET.get('date-from', None)
@@ -372,7 +424,7 @@ def flightEdit(request):
       'content': 'flight-edit-not-found',
       'back_button': backURL
     }
-    return HttpResponse(template.render(context, request))
+    return renderContentTemplate(request, context, template)
 
   flight = Flight.objects.get(id=id)
   if not flight:
@@ -381,7 +433,7 @@ def flightEdit(request):
       'content': 'flight-edit-not-found',
       'back_button': backURL
     }
-    return HttpResponse(template.render(context, request))
+    return renderContentTemplate(request, context, template)
 
   template = loader.get_template('index.html')
 
@@ -423,8 +475,8 @@ def flightEdit(request):
       'data': user
     } for user in page_data
   ]
-
-  return HttpResponse(template.render(context, request))
+  
+  return renderContentTemplate(request, context, template)
 
 @login_required
 def cancelUserFlight(request):
@@ -467,7 +519,6 @@ def addUserFlight(request):
   )
 
   def formDefaultRedirect():
-    print(backURL)
     return redirect(backURL)
 
   if request.method == 'POST':
@@ -517,7 +568,7 @@ def addUserFlight(request):
   context['form'] = form
   context['formActionURL'] = formActionURL
 
-  return HttpResponse(template.render(context, request))
+  return renderContentTemplate(request, context, template)
 
 
 def planes(request):
@@ -544,10 +595,19 @@ def users(request):
     ]
   )
 
+@background(schedule=0)
+def dataGeneratorTask(form):
+  context = {}
+  data = PlanesGenerator(Plane, Flight, User, form)
+  context['content_message'] = 'Generated '+str(len(data['planes']))+' plane/-s, '+str(len(data['flights']))+' flight/-s and '+str(len(data['users']))+' user/-s'
+  context['content'] = 'data-generator-answer'
+  
+  
 @login_required
-def dataGenerator(request):
+def dataGenerator(request, contextPrototype={}):
   template = loader.get_template('data-generator.html')
   context = {
+    **contextPrototype,
     'content': 'data-generator',
     'form': None
   }
@@ -556,32 +616,45 @@ def dataGenerator(request):
     form = DataGeneratorForm(request.POST)
     if form.is_valid():
       context['content'] = 'data-generator-answer'
-      data = PlanesGenerator(Plane, Flight, User, form)
-      context['content_message'] = 'Generated '+str(len(data['planes']))+' planes and '+str(len(data['flights']))+' flights'
+      input = form.cleaned_data
+      dataGeneratorTask({
+        'users_count': int(input['users_count']),
+        'planes_count': int(input['planes_count']),
+        'plane_seats_count_min': int(input['plane_seats_count_min']),
+        'plane_seats_count_max': int(input['plane_seats_count_max']),
+        'plane_flights_count_min': int(input['plane_flights_count_min']),
+        'plane_flights_count_max': int(input['plane_flights_count_max']),
+        'plane_flights_count_per_day': int(input['plane_flights_count_per_day']),
+        'plane_reg_format': str(input['plane_reg_format']),
+      })
 
   else:
-    #form = DataGeneratorForm(initial={
-    #  'users_count': 5,
-    #  'planes_count': 1,
-    #  'plane_seats_count_min': 1,
-    #  'plane_seats_count_max': 2,
-    #  'plane_flights_count_min': 2,
-    #  'plane_flights_count_max': 4,
-    #  'plane_reg_format': 'CCCNNNNNN'
-    #})
-    form = DataGeneratorForm(initial={
-      'users_count': 1000,
-      'planes_count': 60,
-      'plane_seats_count_min': 11,
-      'plane_seats_count_max': 450,
-      'plane_flights_count_min': 0,
-      'plane_flights_count_max': 18,
-      'plane_reg_format': 'CCCNNNNNN'
-    })
+    if False: # For debug purposes
+      form = DataGeneratorForm(initial={
+        'users_count': 5,
+        'planes_count': 1,
+        'plane_seats_count_min': 1,
+        'plane_seats_count_max': 2,
+        'plane_flights_count_min': 2,
+        'plane_flights_count_max': 4,
+        'plane_flights_count_per_day': 5,
+        'plane_reg_format': 'CCCNNNNNN'
+      })
+    else:
+      form = DataGeneratorForm(initial={
+        'users_count': 7000,
+        'planes_count': 130,
+        'plane_seats_count_min': 20,
+        'plane_seats_count_max': 500,
+        'plane_flights_count_min': 50,
+        'plane_flights_count_max': 90,
+        'plane_flights_count_per_day': 4,
+        'plane_reg_format': 'CCC-NNNNNN'
+      })
 
   context['form'] = form
-
-  return HttpResponse(template.render(context, request))
+  
+  return renderContentTemplate(request, context, template)
 
   #template = loader.get_template('data-generator.html')
   #context = {
@@ -595,7 +668,7 @@ def dataGeneratorPopup(request):
   context = {
     'content': 'data-generator'
   }
-  return HttpResponse(template.render(context, request))
+  return renderContentTemplate(request, context, template)
 
 @login_required
 def adminPopup(request):
@@ -603,11 +676,19 @@ def adminPopup(request):
   context = {
     'content': 'admin'
   }
-  return HttpResponse(template.render(context, request))
+  return renderContentTemplate(request, context, template)
 
+@login_required
+def serverStatus(request):
+  template = loader.get_template('index.html')
+  context = {
+    'content': 'server-status'
+  }
+  return renderContentTemplate(request, context, template)
+  
 def index(request):
   template = loader.get_template('index.html')
   context = {
     'content': 'home'
   }
-  return HttpResponse(template.render(context, request))
+  return renderContentTemplate(request, context, template)

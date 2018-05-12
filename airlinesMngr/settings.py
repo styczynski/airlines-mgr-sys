@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
+    'background_task'
 ]
 
 MIDDLEWARE = [
@@ -133,3 +135,13 @@ CACHES = {
 }
 
 LOGIN_REDIRECT_URL = '/airlines/'
+
+ASGI_APPLICATION = 'airlinesMngr.routing.application'
+CHANNEL_LAYERS = {
+  'default': {
+    'BACKEND': 'channels_redis.core.RedisChannelLayer',
+    'CONFIG': {
+      "hosts": [('localhost', 6379)],
+    },
+  },
+}

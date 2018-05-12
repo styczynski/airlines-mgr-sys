@@ -8,6 +8,7 @@ class DataGeneratorForm(forms.Form):
   plane_seats_count_max = forms.DecimalField(label='Maximum number of seats', min_value=0, max_value=10000)
   plane_flights_count_min = forms.DecimalField(label='Minimum number of flights per plane', min_value=0, max_value=10000)
   plane_flights_count_max = forms.DecimalField(label='Maximum number of flights per plane', min_value=0, max_value=10000)
+  plane_flights_count_per_day = forms.DecimalField(label='Maximum number of plane\'s flights per day', min_value=0, max_value=10000)
   plane_reg_format = forms.ChoiceField(label='Plane reg. format', choices=[
     ('CCCNNNNNN', '3-letter 6-digit registration'),
     ('........', '8-character hash'),

@@ -28,6 +28,7 @@
         <link rel="stylesheet" href="{% static 'airlines/forms.css' %}">
         <link rel="stylesheet" href="{% static 'airlines/home.css' %}">
     </head>
+    
     {% if content == 'home' %}
       <body class="home">
     {% else %}
@@ -67,6 +68,10 @@
       {% include "navigation/footer.html" %}
       
       {% include "navigation/messages.html" %}
+      
+      {% if user_auth %}
+        {% include "sockets/server_status.html" %}
+      {% endif %}
       
     </body>
 </html>

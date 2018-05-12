@@ -19,6 +19,7 @@ urlpatterns = [
   path('flight-cancel-user-flight', views.cancelUserFlight, name='cancelUserFlight'),
   path('flight-add-user-flight', views.addUserFlight, name='addUserFlight'),
   path('data-generator-popup', views.dataGeneratorPopup, name='dataGeneratorPopup'),
+  path('server-status', views.serverStatus, name='serverStatus'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

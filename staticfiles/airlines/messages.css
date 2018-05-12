@@ -4,12 +4,13 @@
   left: 0;
   width: 100vw;
   pointer-events: none;
+  z-index: 99999999999;
 }
 
 .messagesContainer .message {
   font-family: 'PT Sans', sans-serif;
-  color: rgba(39,34,34,0.839);
-  background-color: rgba(7,97,0,0.419);
+  color: white;
+  background-color: rgba(7,97,0,1);
   padding: 1vw;
   margin-left: 30vw;
   font-weight: bold;
