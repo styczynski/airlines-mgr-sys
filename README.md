@@ -2,7 +2,7 @@
 
 [![Screenshot of webpage][screenshot1]](https://github.com/styczynski/airlines-mgr-sys)
 
-# 📜 The Airlines Manager System
+# 📜 :airplane: The Airlines Manager System
 
   The purpose of this project completed as an assignment for 3W subject was to design Django system for managing airlines data.
   
@@ -39,7 +39,7 @@ and available via *redis-server* command.
     pip install -r requirements.txt
   ```
   
-## Generator commands
+## :airplane: *airm* commands
 
  Generator script `generate` supports the following commands:
  
@@ -59,7 +59,14 @@ and available via *redis-server* command.
  
           Alias for executing setup and then server command
  
- 
+## Features
+
+[![Screenshot of features][screenshot_features]](https://github.com/styczynski/airlines-mgr-sys)
+
+* Sortable, filterable tables with all useful data
+* Ability to add and remove users from flights
+* Data generator to provide dummy names for the system
+* Real-time server notification via Django Channels
  
 [![Screenshot of webpage][screenshot2]](https://github.com/styczynski/airlines-mgr-sys)
 
@@ -70,4 +77,6 @@ and available via *redis-server* command.
 [screenshot1]: https://raw.githubusercontent.com/styczynski/airlines-mgr-sys/master/static/screenshot.png
 
 [screenshot2]: https://raw.githubusercontent.com/styczynski/airlines-mgr-sys/master/static/screenshot2.png
+
+[screenshot_features]: https://raw.githubusercontent.com/styczynski/airlines-mgr-sys/master/static/screenshot_features.png
 
