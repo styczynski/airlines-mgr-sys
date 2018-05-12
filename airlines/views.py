@@ -642,12 +642,12 @@ def dataGenerator(request, contextPrototype={}):
       })
     else:
       form = DataGeneratorForm(initial={
-        'users_count': 7000,
-        'planes_count': 130,
+        'users_count': 3500,
+        'planes_count': 91,
         'plane_seats_count_min': 20,
         'plane_seats_count_max': 500,
         'plane_flights_count_min': 50,
-        'plane_flights_count_max': 90,
+        'plane_flights_count_max': 75,
         'plane_flights_count_per_day': 4,
         'plane_reg_format': 'CCC-NNNNNN'
       })

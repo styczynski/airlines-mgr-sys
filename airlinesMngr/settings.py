@@ -27,9 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
-
+# Installed apps
 INSTALLED_APPS = [
     'airlines.apps.AirlinesConfig',
     'django.contrib.admin',
@@ -42,6 +40,7 @@ INSTALLED_APPS = [
     'background_task'
 ]
 
+# All middlewares
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -52,8 +51,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Root url
 ROOT_URLCONF = 'airlinesMngr.urls'
 
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -128,15 +129,11 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'staticfiles'),
 )
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    }
-}
-
 LOGIN_REDIRECT_URL = '/airlines/'
 
 ASGI_APPLICATION = 'airlinesMngr.routing.application'
+
+# Django channels support
 CHANNEL_LAYERS = {
   'default': {
     'BACKEND': 'channels_redis.core.RedisChannelLayer',

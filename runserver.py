@@ -13,16 +13,18 @@ background_processor = None
 redis_server = None
 
 try:
+  # Run background task runner
   background_processor = Popen(['python', 'manage.py', 'process_tasks'])
 except:
   background_processor = None
 
 try:
+  # Run Redis
   redis_server = Popen(['redis-server'])
 except:
   redis_server = None
 
-  
+# Run Django devserver
 call(['python', 'manage.py', 'runserver'])
 
 try:

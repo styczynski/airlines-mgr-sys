@@ -9,6 +9,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
 disableSockets = False
+lastProgress = 0
 
 airports = [
   'Warsaw',
@@ -822,18 +823,25 @@ def grouper(iterable, n, fillvalue=None):
 def save_list(objDescription, objList, max_count_per_save=100):
   chunks_count = len(objList) // max_count_per_save
   chunks_i = 0
+  progressThreshold = chunks_count / 20 + 1
   for objChunk in grouper(objList, max_count_per_save, None):
     chunks_i = chunks_i + 1
-    printProgress('Saving '+str(objDescription), chunks_i, chunks_count)
+    printProgress('Saving '+str(objDescription), chunks_i, chunks_count, progressThreshold=progressThreshold)
     with transaction.atomic():
       for obj in objChunk:
         if obj:
           obj.save()
   
-def printProgress(task, current, maximum):
+def printProgress(task, current, maximum, progressThreshold=1):
 
+  global lastProgress
   global disableSockets
 
+  if current >= lastProgress-progressThreshold and current <= lastProgress+progressThreshold:
+    return True
+    
+  lastProgress = current
+  
   if maximum <= 0:
     maximum = 1
   print('[DataGenerator] '+str(task)+' '+str(((current / maximum * 10000) // 10) / 10) + '%')
@@ -1021,7 +1029,7 @@ def PlanesGenerator(Plane, Flight, User, form_data):
   print('Start generating planes')
   
   for plane_index in range(planes_count):
-    printProgress('Generating planes', plane_index+1, planes_count)
+    printProgress('Generating planes', plane_index+1, planes_count, progressThreshold=100)
     
     reg_id = ''
     seats_count = seats_samples[randint(0, seats_samples_count-1)]
@@ -1045,7 +1053,7 @@ def PlanesGenerator(Plane, Flight, User, form_data):
   save_list('planes', generated_planes)
 
   for plane_index in range(planes_count):
-    printProgress('Generating subscriptions', plane_index+1, planes_count)
+    printProgress('Generating subscriptions', plane_index+1, planes_count, progressThreshold=100)
     
     plane = generated_planes[plane_index]
     last_flight_status = {}
@@ -1065,7 +1073,7 @@ def PlanesGenerator(Plane, Flight, User, form_data):
   users_objs = []
   user_names_table = {}
   for i in range(users_count):
-    printProgress('Generating users', i+1, users_count)
+    printProgress('Generating users', i+1, users_count, progressThreshold=1000)
     userGen = generateUser(user_samples[i], User, user_names_table)
     if userGen:
       users_objs.append(userGen['user_obj'])
@@ -1074,9 +1082,10 @@ def PlanesGenerator(Plane, Flight, User, form_data):
   save_list('users', users_objs)
   
   users_data_len = len(users_data)
-  for i in range(users_data_len):
-    printProgress('Matching users with flights', i+1, users_data_len)
-    userInheritFlights(users_data[i])
+  with transaction.atomic():
+    for i in range(users_data_len):
+      printProgress('Matching users with flights', i+1, users_data_len, progressThreshold=25)
+      userInheritFlights(users_data[i])
     
   save_list('users with flights', users_objs)
 
