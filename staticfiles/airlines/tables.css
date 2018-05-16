@@ -67,6 +67,11 @@ table tbody tr:hover {
   color: white;
 }
 
+table tbody tr.no-hover:hover {
+  background: rgba(249, 195, 200, 0.0784313725490196);
+  color: black;
+}
+
 table tbody tr td code {
   background: rgba(230,215,158,0.349);
   padding: 5px;

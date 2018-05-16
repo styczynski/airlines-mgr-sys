@@ -13,10 +13,10 @@
         <script src="{% static 'airlines/vendor/magnific-popup.js' %}"></script>
         <script src="{% static 'airlines/vendor/moment.js' %}"></script>
         <script src="{% static 'airlines/sortable-table.js' %}"></script>
-        <script src="{% static 'airlines/index.js' %}"></script>
         <script src="{% static 'airlines/navigation.js' %}"></script>
         <script src="{% static 'airlines/header.js' %}"></script>
         <script src="{% static 'airlines/messages.js' %}"></script>
+        <script src="{% static 'airlines/fetch.js' %}"></script>
         <link rel="stylesheet" href="{% static 'airlines/vendor/magnific-popup.css' %}">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.12/css/all.css" integrity="sha384-G0fIWCsCzJIMAVNQPfjH08cyYaUtMwjJwqiRKxxE/rx96Uroj1BtIQ6MLJuheaO9" crossorigin="anonymous">
         <link rel="stylesheet" href="{% static 'airlines/header.css' %}">
@@ -27,6 +27,12 @@
         <link rel="stylesheet" href="{% static 'airlines/login.css' %}">
         <link rel="stylesheet" href="{% static 'airlines/forms.css' %}">
         <link rel="stylesheet" href="{% static 'airlines/home.css' %}">
+        <link rel="stylesheet" href="{% static 'airlines/crews-panel.css' %}">
+        {% if content == 'crews-panel' %}
+          <script src="{% static 'airlines/crews-panel.js' %}"></script>
+        {% else %}
+          <script src="{% static 'airlines/index.js' %}"></script>
+        {% endif %}
     </head>
     
     {% if content == 'home' %}
@@ -63,6 +69,16 @@
         {% if content == 'users' %}
           {% include "content/users.html" %}
         {% endif %}
+        {% if content == 'crews' %}
+          {% include "content/crews.html" %}
+        {% endif %}
+        {% if content == 'workers' %}
+          {% include "content/workers.html" %}
+        {% endif %}
+        {% if content == 'crews-panel' %}
+          {% include "content/crews-panel.html" %}
+        {% endif %}
+        
       </main>
       
       {% include "navigation/footer.html" %}

@@ -23,6 +23,17 @@
       <td>Departure / Arrival</td>
       <td>{{ flight.start }} / {{ flight.end }}</td>
     </tr>
+    
+    <tr>
+      <td>Flight crew</td>
+      <td>
+        {% if flight.crew %}
+          <code>{{ flight.crew.crew_id }}</code>
+        {% else %}
+          No crew
+        {% endif %}
+      </td>
+    </tr>
      
     <tr>
       <td>Bought tickets</td>

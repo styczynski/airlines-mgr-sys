@@ -34,4 +34,24 @@
       <a href="/airlines/users">Users</a>
     </li>
   {% endif %}
+  
+  {% if content == 'crews' %}
+    <li class="active">
+      <a href="/airlines/crews">Crews</a>
+    </li>
+  {% else %}
+    <li>
+      <a href="/airlines/crews">Crews</a>
+    </li>
+  {% endif %}
+  
+  {% if content == 'workers' %}
+    <li class="active">
+      <a href="/airlines/workers">Workers</a>
+    </li>
+  {% else %}
+    <li>
+      <a href="/airlines/workers">Workers</a>
+    </li>
+  {% endif %}
 </ul>

@@ -58,6 +58,14 @@
           Capacity
         </a>
       </th>
+      <th data-view="plane-plate">
+        <a
+          class="{{ sort_links.crew_id.mode }}"
+          href="{{ sort_links.crew_id.link }}"
+        >
+          Crew
+        </a>
+      </th>
       <th>
         <a
           class="{{ sort_links.number_of_tickets.mode }}"
@@ -79,6 +87,11 @@
             <td>{{ flight.start|date:"U" }}</td>
             <td>{{ flight.end|date:"U" }}</td>
             <td>{{ flight.seats_count }}</td>
+            {% if flight.crew_id %}
+              <td>{{ flight.crew_id }}</td>
+            {% else %}
+              <td> --- </td>
+            {% endif %}
             <td>{{ flight.tickets_count }}</td>
         </tr>
       {% endfor %}
