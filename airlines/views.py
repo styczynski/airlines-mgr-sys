@@ -91,10 +91,10 @@ def flights(request):
   data_list = Flight.objects.annotate(number_of_tickets=Count('tickets'))
 
   if filter_date_from:
-      data_list = data_list.filter(start__gte=filter_date_from)
+      data_list = data_list.filter(start__date__gte=filter_date_from)
 
   if filter_date_to:
-      data_list = data_list.filter(end__lte=filter_date_to)
+      data_list = data_list.filter(end__date__lte=filter_date_to)
 
   return rendering.renderContentPage(
     'flights',

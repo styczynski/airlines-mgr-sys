@@ -12,6 +12,14 @@
     </li>
   </ul>
 </nav>
+
+<form class="filter">
+  <table class="small">
+    {{ filter_form.as_table }}
+  </table>
+  <input class="small" type="submit" value="Apply filtering" />
+</form>
+
 <table class="crews-table">
   <thead>
     <tr>

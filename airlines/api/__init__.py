@@ -14,7 +14,7 @@ def createRouter():
   router.register(r'crews', CrewList, base_name='crews/')
   router.register(r'crews/search/(?P<crew_id>.+)', CrewList, base_name='crews/search/')
   router.register(r'planes', PlaneViewSet)
-  router.register(r'flights', FlightViewSet)
+  router.register(r'flights', FlightList, base_name='flights')
   router.register(r'flights/by-date/start/(?P<date_start>.+)', FlightList, base_name='flights/by-date/')
   router.register(r'flights/by-date/end/(?P<date_end>.+)', FlightList, base_name='flights/by-date/')
   router.register(r'flights/by-date/(?P<date_start>.+)', FlightList, base_name='flights/by-date/')

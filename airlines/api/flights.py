@@ -49,12 +49,17 @@ class FlightList(viewsets.ModelViewSet):
       if 'date_day' in self.kwargs:
         date_start = self.kwargs['date_day']
         date_end = self.kwargs['date_day']
+        
+      if self.request.query_params.get('from'):
+        date_start = self.request.query_params.get('from')
+      if self.request.query_params.get('to'):
+        date_end = self.request.query_params.get('to')
       
       flights = Flight.objects.all()
       if date_start:
-        flights = flights.filter(start__gte=date_start)
+        flights = flights.filter(start__date__gte=date_start)
       if date_end:
-        flights.filter(end__lte=date_end)
+        flights.filter(end__date__lte=date_end)
         
       return flights
       

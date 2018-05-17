@@ -13,11 +13,71 @@ $(document).ready(function(){
   } else {
     pageNo = 0;
   }
+ 
+  function extractPositiveNumParm(name) {
+    if(getParameterByName(name)) {
+      if(parseInt(getParameterByName(name))) {
+        //console.log(name+" = "+parseInt(getParameterByName(name)));
+        return parseInt(getParameterByName(name));
+      }
+    }
+    //console.log(name+" = ?"); 
+    return null;
+  };
+ 
+  var filterMomentFrom = moment();
+  if(extractPositiveNumParm('from_date_year')) {
+    var val = extractPositiveNumParm('from_date_year');
+    filterMomentFrom.year(val);
+    $('form.filter select[name="from_date_year"]').val(val);
+  }
+  if(extractPositiveNumParm('from_date_month')) {
+    var val = extractPositiveNumParm('from_date_month');
+    filterMomentFrom.month(val-1);
+    $('form.filter select[name="from_date_month"]').val(val);
+  }
+  if(extractPositiveNumParm('from_date_day')) {
+    var val = extractPositiveNumParm('from_date_day');
+    filterMomentFrom.date(val);
+    $('form.filter select[name="from_date_day"]').val(val);
+  }
+  
+  var filterMomentTo = moment();
+  if(extractPositiveNumParm('to_date_year')) {
+    var val = extractPositiveNumParm('to_date_year');
+    filterMomentTo.year(val);
+    $('form.filter select[name="to_date_year"]').val(val);
+  }
+  if(extractPositiveNumParm('to_date_month')) {
+    var val = extractPositiveNumParm('to_date_month');
+    filterMomentTo.month(val-1);
+    $('form.filter select[name="tom_date_month"]').val(val);
+  }
+  if(extractPositiveNumParm('to_date_day')) {
+    var val = extractPositiveNumParm('to_date_day');
+    filterMomentTo.date(val);
+    $('form.filter select[name="to_date_day"]').val(val);
+  }
+ 
+  var dateFiltering = {
+    'from': filterMomentFrom.format('YYYY-MM-DD'),
+    'to': filterMomentTo.format('YYYY-MM-DD')
+  };
+  
+  
+  
+  //$('form.filter input[type="submit"]').click(function(e){
+    //console.log('submit');
+    //var formData = $('form.filter').serialize();
+    //console.log(formData);
+    //e.preventDefault();
+    //return false;
+  //});
   
   
   function renderCrewsTable(flightsApiURL){
     
-    var flightsApiURL = `flights?offset=${pageOffset}`;
+    var flightsApiURL = `flights?offset=${pageOffset}&from=${dateFiltering.from}&to=${dateFiltering.to}`;
     
     crewsTableBody.children().remove();
     crewsTableNav.children().remove();

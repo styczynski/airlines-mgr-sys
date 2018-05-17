@@ -165,18 +165,18 @@ def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_si
   orderby_attr_found = False
   for attr in attr_names:
     if orderby == attr:
-      data_list = data_list.order_by(attr).reverse()
+      data_list = data_list.order_by(attr) #.reverse()
       orderby_attr_found = True
       break
   if not orderby_attr_found:
     orderby = attr_names[0]
 
   if mode == 'asc':
-    data_list = data_list.reverse()
+    data_list = data_list #.reverse()
   elif mode == 'desc':
     mode = 'desc'
   else:
-    data_list = data_list.reverse()
+    data_list = data_list #.reverse()
     mode = 'asc'
 
   paginator = Paginator(data_list, page_size)
@@ -198,6 +198,7 @@ def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_si
     return argurl(
         None,
         {
+            **request.GET.dict(),
             **pageAttrs,
             'page': str(pageno),
             'orderby': newOrderBy,
@@ -262,7 +263,7 @@ def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_si
     if pages_max > paginator.num_pages:
       pages_max = paginator.num_pages
 
-    pages = pages[pages_min:pages_max]
+    pages = [] #pages[pages_min:pages_max]
 
     if len(pages) <= 1:
       pages = None
@@ -346,7 +347,7 @@ def generateStaticPages():
     print('[STATIC_RENDER] Render static page: '+page)
     content = renderContentTemplate(
       None,
-      {},
+      static.getPageContext(page),
       loader.get_template('index.html'),
       pageName=page,
       wrapRequest=False
