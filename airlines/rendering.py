@@ -16,7 +16,6 @@ import os
 import json
 
 DEFAULT_PAGE_SIZE     = 30
-FLIGHT_EDIT_PAGE_SIZE = 15
 
 from . import static
 

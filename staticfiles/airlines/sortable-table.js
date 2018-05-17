@@ -213,7 +213,7 @@ var SortableTable = {};
           });
           
           var context = clickedElement.data('context');
-          if(!context) {
+          if(context === null || typeof context === 'undefined') {
             context = null;
           }
           

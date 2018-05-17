@@ -20,6 +20,9 @@ from .datagenerator.planes import PlanesGenerator
 
 from . import rendering
 
+FLIGHT_EDIT_PAGE_SIZE = 15
+
+
 def flights(request):
 
   filter_date_from = request.GET.get('date-from', None)

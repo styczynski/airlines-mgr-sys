@@ -5,6 +5,8 @@ from .workers import WorkerViewSet
 from .crews import CrewList
 from .flights import FlightViewSet, FlightList, FlightPartialUpdate
 from .planes import PlaneViewSet
+from .auth import AuthViewSet
+
 
 def createRouter():
   router = routers.DefaultRouter()
@@ -19,4 +21,5 @@ def createRouter():
   router.register(r'flights/by-date/(?P<date_start>.+)/(?P<date_end>.+)', FlightList, base_name='flights/by-date/')
   router.register(r'flights/day/(?P<date_day>.+)', FlightList, base_name='flights/day/')
   router.register(r'flights/update', FlightPartialUpdate, base_name='flights/update/')
+  router.register(r'check-auth', AuthViewSet, base_name='check-auth/')
   return router
