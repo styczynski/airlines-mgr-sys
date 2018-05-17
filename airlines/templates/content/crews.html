@@ -1,3 +1,17 @@
+<nav class="subsections">
+  <ul>
+    <li class="active">
+      <a href="crews">
+        List
+      </a>
+    </li>
+    <li>
+      <a href="crews-panel">
+        Assign to flights
+      </a>
+    </li>
+  </ul>
+</nav>
 <table>
   <thead>
     <tr>
@@ -35,15 +49,16 @@
             <td>{{ crew.crew_id }}</td>
             {% if crew.flight_set.all.count %}
               <td>
-                <ul>
+                <ul class='flight-details'>
                   {% for flight in crew.flight_set.all %}
                     <li>
                       <code>
                         {{ flight.plane.reg_id }}
                       </code>
                       <b>{{ flight.src }}</b>
-                      -&gt;
+                      &#x1f852;
                       <b>{{ flight.dest }}</b>
+                      ({{ flight.start|date:"H:m" }})
                     </li>
                   {% endfor %}
                 </ul>
@@ -57,7 +72,7 @@
     {% else %}
       <tr>
         <td colspan="3">
-          <p>No crews are available.</p>
+          <p class='flight-details-na'>No crews are available.</p>
         </td>
       </tr>
     {% endif %}

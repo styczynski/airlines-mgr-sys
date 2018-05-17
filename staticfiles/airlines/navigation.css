@@ -55,6 +55,35 @@ main > nav ul li:hover a {
   color: #5f3237;
 }
 
+main > nav.subsections ul {
+  text-align: center;
+  padding-top: 0vw;
+  padding-bottom: 0vw;
+  width: 100%;
+  display: flex;
+}
+
+main > nav.subsections ul li {
+  padding-left: 5vw;
+  padding-right: 5vw;
+  padding-top: 1vw;
+  padding-bottom: 1vw;
+  background-color: #975259;
+  display: inline;
+  width: 100%;
+  border: 2px solid transparent;
+}
+
+main > nav.subsections ul li.active {
+  border: 2px solid white;
+}
+
+main > nav.subsections ul li:hover {
+  background-color: white;
+  color: #975259;
+}
+
+
 .pages {
   width: 100%;
   padding: 0;

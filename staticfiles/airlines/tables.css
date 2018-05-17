@@ -99,3 +99,41 @@ table.small th {
   background: rgba(249, 195, 200, 0.0784313725490196);
   border-bottom: 1px #975259 solid;
 }
+
+.flight-details {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flight-details li {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.flight-details code {
+  margin-right: 20px;
+}
+
+.flight-details-wrapper {
+  margin-left: 20px;
+}
+
+.flight-details-table table {
+  margin-top: 0;
+  width: 80vw;
+  background: white;
+}
+
+.flight-details-table table tr {
+  cursor: default;
+}
+
+.flight-details-table table td {
+  cursor: default;
+}
+
+.flight-details-table table tr:hover {
+  background: white;
+  color: black;
+}

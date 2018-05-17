@@ -206,19 +206,32 @@ $(document).ready(function(){
               `;
             }
             
+            var detailsTextDep = moment.unix(parseInt(flightForRow.departure)).toNow();
+            var detailsTextArr = moment.unix(parseInt(flightForRow.departure)).fromNow();
+            var detailsTextSoldPerc = parseInt(flightForRow.tickets.length / flightForRow.plane.seats_count * 100)/100;
+            
             expandedContentData.append(`
+              <div class="flight-details-table">
+                <table>
+                  <tr>
+                    <td>Departure:</td>
+                    <td>${detailsTextDep}</td>
+                  </tr>
+                  <tr>
+                    <td>Arrival:</td>
+                    <td>${detailsTextArr}</td>
+                  </tr>
+                  <tr>
+                    <td>Sold tickets:</td>
+                    <td>${flightForRow.tickets.length} (${detailsTextSoldPerc}%)</td>
+                  </tr>
+                </table>
+              </div>
               ${restrictedArea}
               <button class="button-edit small">
                  <i class="fas fa-info-circle"></i>
                  Flight details
               </button>
-              <div class="details">
-                <ul>
-                  <li>Departure: ${flightForRow.departure}</li>
-                  <li>Arrival: ${flightForRow.departure}</li>
-                  <li>Sold tickets: ${flightForRow.tickets.length / flightForRow.plane.seats_count} %</li>
-                </ul>
-              </div>
               <div class="edit-box"></div>
             `);
             
