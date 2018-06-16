@@ -17,10 +17,10 @@
     <tr>
         <th data-view="plane-plate">
             <a
-                    class="{{ sort_links.crew_id.mode }}"
-                    href="{{ sort_links.crew_id.link }}"
+                    class="{{ sort_links.crew_name.mode }}"
+                    href="{{ sort_links.crew_name.link }}"
             >
-                Crew ID
+                Crew
             </a>
         </th>
         <th>
@@ -46,7 +46,7 @@
     {% if page_data %}
     {% for crew in page_data %}
     <tr>
-        <td>{{ crew.crew_id }}</td>
+        <td>{{ crew.crew_name }}</td>
         {% if crew.flight_set.all.count %}
         <td>
             <!--<ul class='flight-details'>

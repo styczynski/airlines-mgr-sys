@@ -61,11 +61,16 @@ class FlightList(viewsets.ModelViewSet):
         if self.request.query_params.get('to'):
             date_end = self.request.query_params.get('to')
 
+        print('FILTER FROM DATE:')
+        print(date_start)
+        print('FILTER TO DATE:')
+        print(date_end)
+
         flights = Flight.objects.all()
         if date_start:
             flights = flights.filter(start__date__gte=date_start)
         if date_end:
-            flights.filter(end__date__lte=date_end)
+            flights = flights.filter(end__date__lte=date_end)
 
         flights.order_by('start')
 
@@ -119,9 +124,9 @@ class FlightPartialUpdate(viewsets.ModelViewSet, UpdateModelMixin):
                 if invalid_date:
                     if last_flight:
                         flight_spec = last_flight['flight'].plane.reg_id + ' and ' + flight_time[
-                            'flight'].plane.reg_id + ' (' + last_flight.end + ')'
+                            'flight'].plane.reg_id + '\n(' + str(last_flight['end']) + ')'
                         raise InvalidCrewSchedule(
-                            'Invalid crew schedule was specified: two flights with colliding dates: ' + flight_spec)
+                            'Invalid crew schedule was specified:\ntwo flights with colliding dates: ' + flight_spec)
                     raise InvalidCrewSchedule('Invalid crew schedule was specified: two flights with colliding dates')
                 last_end = flight_time['end']
                 first_flight = False

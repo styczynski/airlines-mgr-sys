@@ -11,7 +11,7 @@
     <tr>
         <th data-view="plane-plate">
             <a
-                    class="{{ sort_links.plane__reg_id.mode }}"
+                    class="{{ sort_links.plane__reg_id.mode }} sort-by-plane-plate"
                     href="{{ sort_links.plane__reg_id.link }}"
             >
                 Plane
@@ -19,7 +19,7 @@
         </th>
         <th>
             <a
-                    class="{{ sort_links.src.mode }}"
+                    class="{{ sort_links.src.mode }} sort-by-from"
                     href="{{ sort_links.src.link }}"
             >
                 From
@@ -27,7 +27,7 @@
         </th>
         <th>
             <a
-                    class="{{ sort_links.dest.mode }}"
+                    class="{{ sort_links.dest.mode }} sort-by-to"
                     href="{{ sort_links.dest.link }}"
             >
                 To
@@ -35,7 +35,7 @@
         </th>
         <th data-type="date" data-input="X" data-view="from-now">
             <a
-                    class="{{ sort_links.start.mode }}"
+                    class="{{ sort_links.start.mode }} sort-by-target"
                     href="{{ sort_links.start.link }}"
             >
                 Departure
@@ -43,7 +43,7 @@
         </th>
         <th data-type="date" data-input="X" data-view="from-now">
             <a
-                    class="{{ sort_links.end.mode }}"
+                    class="{{ sort_links.end.mode }} sort-by-plane-destination"
                     href="{{ sort_links.end.link }}"
             >
                 Arrival
@@ -51,7 +51,7 @@
         </th>
         <th>
             <a
-                    class="{{ sort_links.plane__seats_count.mode }}"
+                    class="{{ sort_links.plane__seats_count.mode }} sort-by-capacity"
                     href="{{ sort_links.plane__seats_count.link }}"
             >
                 Capacity
@@ -59,15 +59,15 @@
         </th>
         <th data-view="plane-plate">
             <a
-                    class="{{ sort_links.crew_id.mode }}"
-                    href="{{ sort_links.crew_id.link }}"
+                    class="{{ sort_links.crew_name.mode }} sort-by-crew"
+                    href="{{ sort_links.crew_name.link }}"
             >
                 Crew
             </a>
         </th>
         <th>
             <a
-                    class="{{ sort_links.number_of_tickets.mode }}"
+                    class="{{ sort_links.number_of_tickets.mode }} sort-by-tickets"
                     href="{{ sort_links.number_of_tickets.link }}"
             >
                 Tickets sold
@@ -86,8 +86,8 @@
         <td>{{ flight.start|date:"U" }}</td>
         <td>{{ flight.end|date:"U" }}</td>
         <td>{{ flight.seats_count }}</td>
-        {% if flight.crew_id %}
-        <td>{{ flight.crew_id }}</td>
+        {% if flight.crew_name %}
+        <td>{{ flight.crew_name }}</td>
         {% else %}
         <td> ---</td>
         {% endif %}

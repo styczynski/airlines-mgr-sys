@@ -13,10 +13,12 @@ from . import rendering
 
 urlpatterns = [
     url(r'^api/', include(api.createRouter().urls)),
-    url(r'^api-auth/', include('rest_framework.urls')),
+    #url(r'^api-auth/', include('rest_framework.urls')),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': 'flights'}, name='logout'),
     path('', views.index, name='index'),
+    path('tests', views.tests, name='tests'),
+    path('tests-run', views.testsRun, name='tests-run'),
     path('planes', views.planes, name='planes'),
     path('flights', views.flights, name='flights'),
     path('users', views.users, name='users'),
@@ -33,5 +35,3 @@ urlpatterns = [
 ]
 
 urlpatterns += staticfiles_urlpatterns()
-
-# rendering.generateStaticPages()

@@ -19,8 +19,8 @@
         </th>
         <th data-view="plane-plate">
             <a
-                    class="{{ sort_links.crew_id.mode }}"
-                    href="{{ sort_links.name.link }}"
+                    class="{{ sort_links.crew_name.mode }}"
+                    href="{{ sort_links.crew_name.link }}"
             >
                 Crew
             </a>
@@ -34,7 +34,11 @@
     <tr>
         <td>{{ worker.surname }}</td>
         <td>{{ worker.name }}</td>
-        <td>{{ worker.crew.crew_id }}</td>
+        {% if worker.crew_name != " " %}
+            <td>{{ worker.crew_name }}</td>
+        {% else %}
+            <td>---</td>
+        {% endif %}
     </tr>
     {% endfor %}
     {% else %}

@@ -101,12 +101,22 @@
                     callback(res.results || [], res);
                 } else {
                     if (errCallback) {
-                        errCallback();
+                        try {
+                            res = JSON.parse(this.responseText);
+                        } catch (e) {
+                            res = null;
+                        }
+                        errCallback(res);
                     }
                 }
             } else if (this.readyState == 4) {
                 if (errCallback) {
-                    errCallback();
+                    try {
+                        res = JSON.parse(this.responseText);
+                    } catch (e) {
+                        res = null;
+                    }
+                    errCallback(res);
                 }
             }
         };

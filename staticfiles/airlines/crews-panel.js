@@ -28,16 +28,19 @@ $(document).ready(function () {
     var filterMomentFrom = null;
     if (extractPositiveNumParm('from_date_year')) {
         var val = extractPositiveNumParm('from_date_year');
+        if(!filterMomentFrom) filterMomentFrom = moment();
         filterMomentFrom.year(val);
         $('form.filter select[name="from_date_year"]').val(val);
     }
     if (extractPositiveNumParm('from_date_month')) {
         var val = extractPositiveNumParm('from_date_month');
+        if(!filterMomentFrom) filterMomentFrom = moment();
         filterMomentFrom.month(val - 1);
         $('form.filter select[name="from_date_month"]').val(val);
     }
     if (extractPositiveNumParm('from_date_day')) {
         var val = extractPositiveNumParm('from_date_day');
+        if(!filterMomentFrom) filterMomentFrom = moment();
         filterMomentFrom.date(val);
         $('form.filter select[name="from_date_day"]').val(val);
     }
@@ -45,16 +48,19 @@ $(document).ready(function () {
     var filterMomentTo = null;
     if (extractPositiveNumParm('to_date_year')) {
         var val = extractPositiveNumParm('to_date_year');
+        if(!filterMomentTo) filterMomentTo = moment();
         filterMomentTo.year(val);
         $('form.filter select[name="to_date_year"]').val(val);
     }
     if (extractPositiveNumParm('to_date_month')) {
         var val = extractPositiveNumParm('to_date_month');
+        if(!filterMomentTo) filterMomentTo = moment();
         filterMomentTo.month(val - 1);
-        $('form.filter select[name="tom_date_month"]').val(val);
+        $('form.filter select[name="to_date_month"]').val(val);
     }
     if (extractPositiveNumParm('to_date_day')) {
         var val = extractPositiveNumParm('to_date_day');
+        if(!filterMomentTo) filterMomentTo = moment();
         filterMomentTo.date(val);
         $('form.filter select[name="to_date_day"]').val(val);
     }
@@ -96,7 +102,7 @@ $(document).ready(function () {
             crewsRow.append(`<td>${flight.plane.reg_id}</td>`);
 
             if (flight.crew) {
-                crewsRow.append(`<td><code>${flight.crew.crew_id}</code> (${flight.crew.worker_set.length} workers)</td>`);
+                crewsRow.append(`<td><code>${flight.crew.crew_name}</code> (${flight.crew.worker_set.length} workers)</td>`);
             } else {
                 crewsRow.append(`<td>No crew</td>`);
             }
@@ -110,6 +116,7 @@ $(document).ready(function () {
         function updateRow(crewsRow, flightIndex) {
             requestDataAPI('flights', function (flights) {
                 var flight = flights[flightIndex];
+
                 if (!flight) return;
                 crewsTableBody.find('.content-expanded').remove();
                 renderRowContent(crewsRow, flight, flightIndex);
@@ -255,7 +262,26 @@ $(document).ready(function () {
                                 patchDataAPI(`flights/update/${flightForRow.id}/`, {
                                     'crew': newCrew.id
                                 }, function (res) {
-                                    updateRow(tableRow, context);
+                                    showMessage({
+                                        message: 'Updated flight data successfully.',
+                                        messageType: 'info'
+                                    });
+                                    setTimeout(function() {
+                                        updateRow(tableRow, context);
+                                    }, 700);
+                                }, function(err) {
+                                    let errMessage = 'Unknown server error occurred.'
+                                    if(err) {
+                                        if(err.detail) {
+                                            errMessage = err.detail;
+                                        }
+                                    }
+                                    console.log(errMessage);
+                                    showMessage({
+                                        message: (errMessage || '').replace(/\n/ig, '<br>'),
+                                        messageType: 'error',
+                                        autoHide: false
+                                    });
                                 })
                             };
 
@@ -323,7 +349,7 @@ $(document).ready(function () {
                                         crewSugg.append(suggestions.map(function (crew) {
                                             var option = $(`
                       <li>
-                        <code>${crew.crew_id}</code>
+                        <code>${crew.crew_name}</code>
                         <b>Crew</b>
                         <ul>
                           <li>Currently added to ${crew.flight_set.length} flights</li>
@@ -334,7 +360,7 @@ $(document).ready(function () {
                       </li>
                     `);
                                             option.click(function () {
-                                                crewInput.val(crew.crew_id);
+                                                crewInput.val(crew.crew_name);
                                                 editBox.children().remove();
                                                 changeCrewTo(crew);
                                             });

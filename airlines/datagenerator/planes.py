@@ -1,3 +1,4 @@
+import asyncio
 from django.utils import timezone
 from random import randint
 import random
@@ -6,6 +7,7 @@ import datetime
 from django.db import transaction
 from itertools import zip_longest
 from channels.layers import get_channel_layer
+from channels.exceptions import ChannelFull
 from asgiref.sync import async_to_sync
 
 from .data_airports import *
@@ -21,20 +23,20 @@ def grouper(iterable, n, fillvalue=None):
     return zip_longest(*args, fillvalue=fillvalue)
 
 
-def save_list(objDescription, objList, max_count_per_save=100):
+def save_list(serverStatus, objDescription, objList, max_count_per_save=100):
     chunks_count = len(objList) // max_count_per_save
     chunks_i = 0
     progressThreshold = chunks_count / 20 + 1
     for objChunk in grouper(objList, max_count_per_save, None):
         chunks_i = chunks_i + 1
-        printProgress('Saving ' + str(objDescription), chunks_i, chunks_count, progressThreshold=progressThreshold)
+        printProgress(serverStatus, 'Saving ' + str(objDescription), chunks_i, chunks_count, progressThreshold=progressThreshold)
         with transaction.atomic():
             for obj in objChunk:
                 if obj:
                     obj.save()
 
 
-def printProgress(task, current, maximum, progressThreshold=1):
+def printProgress(serverStatus, task, current, maximum, progressThreshold=1):
 
     global lastProgress
     global disableSockets
@@ -48,22 +50,37 @@ def printProgress(task, current, maximum, progressThreshold=1):
         maximum = 1
     print('[DataGenerator] ' + str(task) + ' ' + str(((current / maximum * 10000) // 10) / 10) + '%')
 
-    if not disableSockets:
+    if not disableSockets or True:
         channel_layer = get_channel_layer()
-        channel_layer.group_send(
-            'server_status_listeners',
-            {
-                'type': 'server_status_message',
-                'message': {
-                    'task_name': str(task),
-                    'task_progress': str(((current / maximum * 10000) // 10) / 10) + '%'
-                },
-                'mode': 'progress'
-            }
-        )
+        #loop = asyncio.get_event_loop()
+        #loop.create_task(
+
+        with transaction.atomic():
+            allChannels = serverStatus['ServerStatusChannels'].objects.all()
+            allChannels._result_cache = None
+            allChannels.count()
+
+        channels = allChannels
+        for channel in channels:
+            try:
+                async_to_sync(channel_layer.send)(
+                    channel.name,
+                    {
+                        'type': 'server_status_message',
+                        'message': {
+                            'task_name': str(task),
+                            'task_progress': str(((current / maximum * 10000) // 10) / 10) + '%'
+                        },
+                        'mode': 'progress'
+                    }
+                )
+            except ChannelFull:
+                # Do nothing
+                nope = True
+            #)
 
 
-def printProgressEnd(obj):
+def printProgressEnd(serverStatus, obj):
     global disableSockets
 
     planes_count = len(obj['planes'])
@@ -74,15 +91,25 @@ def printProgressEnd(obj):
     if not disableSockets:
         try:
             channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                'server_status_listeners',
-                {
-                    'type': 'server_status_message',
-                    'message': 'Generated ' + str(planes_count) + ' plane/-s, ' + str(
-                        flights_count) + ' flight/-s and ' + str(users_count) + ' user/-s',
-                    'mode': 'progress_end'
-                }
-            )
+            allChannels = serverStatus['ServerStatusChannels'].objects.all()
+            allChannels._result_cache = None
+            allChannels.count()
+
+            channels = allChannels
+            for channel in channels:
+                try:
+                    async_to_sync(channel_layer.send)(
+                        channel.name,
+                        {
+                            'type': 'server_status_message',
+                            'message': 'Generated ' + str(planes_count) + ' plane/-s, ' + str(
+                                flights_count) + ' flight/-s and ' + str(users_count) + ' user/-s',
+                            'mode': 'progress_end'
+                        }
+                    )
+                except ChannelFull:
+                    # Do nothing
+                    nope = True
         except:
             disableSockets = True
             return False
@@ -170,7 +197,7 @@ def generateCrew(workers_data, Crew, crew_table):
 
     crew_name = pilot_user['name'] + ' ' + pilot_user['surname']
 
-    crew = Crew(crew_id=crew_name)
+    crew = Crew(capitain=pilot_user['worker'])
     pilot_user['crew'] = crew
     return crew
 
@@ -192,6 +219,7 @@ def generateWorkersFromData(workers_data, Worker):
     for data in workers_data:
         worker = Worker(name=data['name'], surname=data['surname'], crew=data['crew'])
         workers.append(worker)
+        data['worker'] = worker
     return workers
 
 
@@ -236,14 +264,14 @@ def generateFlightSubscriptions(flight, user_samples):
     return user_samples
 
 
-def assignCrewsToFlights(flights_data, crews_objs):
+def assignCrewsToFlights(serverStatus, flights_data, crews_objs):
     flights_data.sort(key=lambda f: f.start, reverse=False)
 
     crew_no = 0
     crew_count = len(crews_objs)
     for crew in crews_objs:
         crew_no = crew_no + 1
-        printProgress('Assigning crews to flights', crew_no, crew_count, progressThreshold=50)
+        printProgress(serverStatus, 'Assigning crews to flights', crew_no, crew_count, progressThreshold=50)
         crew_current_end = None
         for flight in flights_data:
             should_add = False
@@ -265,7 +293,7 @@ def assignCrewsToFlights(flights_data, crews_objs):
                 crew_current_end = flight.end
 
 
-def PlanesGenerator(Plane, Flight, User, Worker, Crew, form_data):
+def PlanesGenerator(serverStatus, Plane, Flight, User, Worker, Crew, form_data):
     with transaction.atomic():
         User.objects.all().delete()
         Flight.objects.all().delete()
@@ -321,7 +349,7 @@ def PlanesGenerator(Plane, Flight, User, Worker, Crew, form_data):
     print('Start generating planes')
 
     for plane_index in range(planes_count):
-        printProgress('Generating planes', plane_index + 1, planes_count, progressThreshold=100)
+        printProgress(serverStatus, 'Generating planes', plane_index + 1, planes_count, progressThreshold=100)
 
         reg_id = ''
         seats_count = seats_samples[randint(0, seats_samples_count - 1)]
@@ -341,10 +369,10 @@ def PlanesGenerator(Plane, Flight, User, Worker, Crew, form_data):
         planes_data.append(plane)
         generated_planes.append(plane)
 
-    save_list('planes', generated_planes)
+    save_list(serverStatus, 'planes', generated_planes)
 
     for plane_index in range(planes_count):
-        printProgress('Generating subscriptions', plane_index + 1, planes_count, progressThreshold=100)
+        printProgress(serverStatus, 'Generating subscriptions', plane_index + 1, planes_count, progressThreshold=100)
 
         plane = generated_planes[plane_index]
         last_flight_status = {}
@@ -370,11 +398,14 @@ def PlanesGenerator(Plane, Flight, User, Worker, Crew, form_data):
     worker_objs = []
     worker_names_table = {}
     for i in range(workers_count):
-        printProgress('Generating workers', i + 1, workers_count, progressThreshold=50)
+        printProgress(serverStatus, 'Generating workers', i + 1, workers_count, progressThreshold=50)
         workerData = generateWorkerData(worker_samples[i], worker_names_table)
         if workerData:
             workers_data.append(workerData);
             # workers_objs.append(workerGen['worker_obj'])
+
+    workers_objs = generateWorkersFromData(workers_data, Worker);
+    save_list(serverStatus, 'workers', workers_objs)
 
     print('Start generating crews')
 
@@ -382,7 +413,7 @@ def PlanesGenerator(Plane, Flight, User, Worker, Crew, form_data):
     crews_objs = []
     crews_count = len(flights_data)
     for i in range(crews_count):
-        printProgress('Generating workers', i + 1, crews_count, progressThreshold=50)
+        printProgress(serverStatus, 'Generating workers', i + 1, crews_count, progressThreshold=50)
         crewGen = generateCrew(workers_data, Crew, crews_table)
         if crewGen:
             crews_objs.append(crewGen)
@@ -394,37 +425,46 @@ def PlanesGenerator(Plane, Flight, User, Worker, Crew, form_data):
         if not worker['crew']:
             worker['crew'] = crews_objs[randint(0, len(crews_objs) - 1)]
 
-    save_list('crews', crews_objs)
+    print('Initially save crews')
 
-    workers_objs = generateWorkersFromData(workers_data, Worker);
+    save_list(serverStatus, 'crews', crews_objs)
+
+    print('Assign new crews to workers and save')
+
+    worker_objs = []
+    for worker in workers_data:
+        worker['worker'].crew = worker['crew']
+        worker_objs.append(worker['worker'])
+
+    save_list(serverStatus, 'workers', worker_objs)
 
     print('Assign crews to flights')
 
-    assignCrewsToFlights(flights_data, crews_objs)
+    assignCrewsToFlights(serverStatus, flights_data, crews_objs)
 
-    save_list('flights', generated_flights)
+    save_list(serverStatus, 'flights', generated_flights)
+    save_list(serverStatus, 'crews', crews_objs)
 
     print('Generate users')
     users_data = []
     users_objs = []
     user_names_table = {}
     for i in range(users_count):
-        printProgress('Generating users', i + 1, users_count, progressThreshold=1000)
+        printProgress(serverStatus, 'Generating users', i + 1, users_count, progressThreshold=1000)
         userGen = generateUser(user_samples[i], User, user_names_table)
         if userGen:
             users_objs.append(userGen['user_obj'])
             users_data.append(userGen['user_data'])
 
-    save_list('users', users_objs)
-    save_list('workers', workers_objs)
+    save_list(serverStatus, 'users', users_objs)
 
     users_data_len = len(users_data)
     with transaction.atomic():
         for i in range(users_data_len):
-            printProgress('Matching users with flights', i + 1, users_data_len, progressThreshold=25)
+            printProgress(serverStatus, 'Matching users with flights', i + 1, users_data_len, progressThreshold=25)
             userInheritFlights(users_data[i])
 
-    save_list('users with flights', users_objs)
+    save_list(serverStatus, 'users with flights', users_objs)
 
     obj = {
         'planes': planes_data,
@@ -432,5 +472,5 @@ def PlanesGenerator(Plane, Flight, User, Worker, Crew, form_data):
         'users': users_data
     }
 
-    printProgressEnd(obj)
+    printProgressEnd(serverStatus, obj)
     return obj

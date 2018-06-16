@@ -12,7 +12,7 @@ def createRouter():
   router = routers.DefaultRouter()
   router.register(r'workers', WorkerViewSet)
   router.register(r'crews', CrewList, base_name='crews/')
-  router.register(r'crews/search/(?P<crew_id>.+)', CrewList, base_name='crews/search/')
+  router.register(r'crews/search/(?P<crew_name>.+)', CrewList, base_name='crews/search/')
   router.register(r'planes', PlaneViewSet)
   router.register(r'flights', FlightList, base_name='flights')
   router.register(r'flights/by-date/start/(?P<date_start>.+)', FlightList, base_name='flights/by-date/')

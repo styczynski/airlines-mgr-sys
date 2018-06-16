@@ -12,8 +12,12 @@ from django.utils.http import urlquote, urlunquote
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from background_task import background
+
+from bs4 import BeautifulSoup as bs
+
 import os
 import json
+import re
 
 DEFAULT_PAGE_SIZE = 30
 
@@ -172,13 +176,14 @@ def paginateContent(pageName, pageAttrs, request, data_list, attr_names, page_si
             break
     if not orderby_attr_found:
         orderby = attr_names[0]
+        data_list = data_list.order_by(attr_names[0])
 
     if mode == 'asc':
-        data_list = data_list  # .reverse()
+        data_list = data_list.reverse()
     elif mode == 'desc':
         mode = 'desc'
     else:
-        data_list = data_list  # .reverse()
+        data_list = data_list.reverse()
         mode = 'asc'
 
     paginator = Paginator(data_list, page_size)
@@ -307,6 +312,10 @@ def renderContentTemplate(request, context, template, pageName=None, wrapRequest
     content = template.render(context, request)
     if not wrapRequest:
         return content
+
+    soup = bs(content)
+    content = soup.prettify()
+
     return HttpResponse(content)
 
 
@@ -336,9 +345,16 @@ def renderContentPage(pageName, request, data_list, attr_list, mapping=None):
     useServerStatus(request, context)
     return renderContentTemplate(request, context, template)
 
+staticPagesGenerated = False
 
-@background(schedule=0)
 def generateStaticPages():
+    global staticPagesGenerated
+
+    if staticPagesGenerated:
+        return
+
+    staticPagesGenerated = True
+
     print('[STATIC_RENDER] Render static pages')
     pages = static.staticPages()
     if not pages:
@@ -366,6 +382,11 @@ def generateStaticPages():
 
 
 def renderStaticPage(page):
+    global staticPagesGenerated
+
+    if not staticPagesGenerated:
+        generateStaticPages()
+
     filename = static.getPagePath(page)
     content = ''
     with open(filename) as f:

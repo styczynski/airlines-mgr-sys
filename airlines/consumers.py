@@ -7,54 +7,42 @@
 #
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from channels.consumer import SyncConsumer
+from django.db import transaction
 from channels.generic.websocket import WebsocketConsumer
 import json
-
+import time
 
 #
 # Delcare a consumer for server real-time status information
 #
 class ServerStatsConsumer(WebsocketConsumer):
+
     def connect(self):
-        try:
-            self.user = self.scope["user"]
-            if not self.user.is_authenticated:
-                self.close()
-                return False
-            if self.user.is_anonymous:
-                self.close()
-                return False
-            async_to_sync(self.channel_layer.group_add)("server_status_listeners", self.channel_name)
-            self.accept()
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                'server_status_listeners',
-                {
-                    'type': 'server_status_message',
-                    'message': 'hello',
-                    'mode': 'init'
-                }
-            )
-        except:
-            return;
-
-    def disconnect(self, close_code):
-        try:
-            async_to_sync(self.channel_layer.group_discard)("server_status_listeners", self.channel_name)
-        except:
-            return;
-
-    def receive(self, text_data):
-        return self
+        (self.accept)()
+        from .models import ServerStatusChannels
+        with transaction.atomic():
+            allChannels = ServerStatusChannels.objects.all()
+            allChannels._result_cache = None
+            allChannels.count()
+            allChannels.delete()
+            ServerStatusChannels.objects.create(name=self.channel_name)
 
     def server_status_message(self, event):
         try:
             message = event['message']
             mode = event['mode']
-            self.send(text_data=json.dumps({
+            (self.send)(text_data=json.dumps({
                 'type': 'server_status_message',
                 'server_mode': mode,
                 'server_status': message
             }))
         except:
             return;
+
+
+#
+#
+# ServerStatusChannels.objects.create(name=self.channel_name)
+#
+#

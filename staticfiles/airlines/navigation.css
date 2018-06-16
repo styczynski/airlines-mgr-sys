@@ -104,7 +104,7 @@ main > .pages ul li a {
     display: block;
 }
 
-button {
+button, .button {
     font-family: 'PT Sans', sans-serif;
     font-weight: bold;
     font-size: 110%;
@@ -123,15 +123,16 @@ button {
     margin-top: 1vw;
 }
 
-button.small {
+button.small, .button.small {
     padding-left: 0.5vw;
     padding-right: 0.5vw;
     font-size: 72%;
     margin-right: 20px;
 }
 
-button:hover {
+button:hover, .button:hover {
     background-color: white;
     color: #4c2b2e;
     border: 2px solid #4c2b2e;
 }
+

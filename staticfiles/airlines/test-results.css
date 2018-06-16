@@ -1,0 +1,68 @@
+.testResults {
+    margin-left: 5vw;
+    font-family: 'PT Sans', sans-serif;
+}
+
+.testResults ul {
+    list-style: none;
+
+}
+
+.testResults th {
+    border-bottom: 1px #975259 solid;
+}
+
+.testResults ul > li {
+    margin-top: 0.2vw;
+}
+
+.testResults table {
+    display: none;
+}
+
+.testResults h1, hr {
+    display: none;
+}
+
+.testResults h2 {
+    font-size: 120%;
+}
+
+.testResults h2:first-child {
+    font-size: 200%;
+}
+
+
+
+.testResults ul > li > a {
+    color: white;
+    background-color: #4c2b2e;
+    display: block;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    padding-top: 0.5vw;
+    padding-bottom: 0.5vw;
+    width: 100%;
+}
+
+.testResults .testname {
+    font-weight: bold;
+    margin-bottom: 1vw;
+    display: block;
+}
+
+.testResults .classname {
+    float: left;
+}
+
+.testResults .duration {
+    color: white;
+    background-color: #4c2b2e;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    padding-top: 0.5vw;
+    padding-bottom: 0.5vw;
+    position: relative;
+    left: 16vw;
+    top: -1.5vw;
+}

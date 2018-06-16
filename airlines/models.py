@@ -90,15 +90,15 @@ class User(models.Model):
 #   * Non-empty crew identificator
 #
 class Crew(models.Model):
-    crew_id = models.CharField('Crew ID', max_length=15)
+    capitain = models.OneToOneField('Worker', on_delete=models.CASCADE, null=False, related_name='managed_crew')
 
     def __str__(self):
-        return 'Crew ' + self.crew_id
+        return 'Crew ' + str(self.capitain.getFullName())
 
-    def clean(self):
-        if len(self.crew_id) <= 0:
-            raise ValidationError('Crew ID should contain at least one character')
-        validateCrewSchedule(self)
+    #def clean(self):
+    #    if len(self.crew_id) <= 0:
+    #        raise ValidationError('Crew ID should contain at least one character')
+    #    validateCrewSchedule(self)
 
 #
 # Model for flights
@@ -146,10 +146,13 @@ class Flight(models.Model):
 class Worker(models.Model):
     surname = models.CharField('Surname', max_length=100)
     name = models.CharField('Name', max_length=100)
-    crew = models.ForeignKey(Crew, on_delete=models.CASCADE, null=True)
+    crew = models.ForeignKey(Crew, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         unique_together = ('surname', 'name',)
+
+    def getFullName(self):
+        return self.surname + ' ' + self.name
 
     def __str__(self):
         return 'Worker ' + self.surname + ' ' + self.name
@@ -159,3 +162,9 @@ class Worker(models.Model):
             raise ValidationError('Worker name should contain at least one character')
         if len(self.surname) <= 0:
             raise ValidationError('Worker surname should contain at least one character')
+
+class ServerStatusChannels(models.Model):
+    name = models.CharField('Channel name', max_length=100)
+
+    def __str__(self):
+        return 'Channel '+self.name

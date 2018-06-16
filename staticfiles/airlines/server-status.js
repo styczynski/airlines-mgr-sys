@@ -1,38 +1,12 @@
-(function () {
-    try {
-        console.log('Pull server status from "{{ server_status_url }}"');
-        var statusSocket = new WebSocket('{{ server_status_url }}');
-        var realTimeStatusEnabled = false;
-        var realTimeStatusMessageID = null;
-        var forceDisable = false;
+$(document).ready(function() {
+    (function () {
 
-        function makeForceDisable() {
-            forceDisable = true;
-            /*setTimeout(function(){
-              $('figure.real-time-status').html('<i class="fas fa-ban"></i><b>Real time status disabled</b>');
-            },100);*/
-        }
-
-        statusSocket.onopen = function (e) {
-            e.stopImmediatePropagation()
-            e.stopPropagation()
-            e.preventDefault()
-            return false;
-        };
-
-        statusSocket.onerror = function (e) {
-            e.stopImmediatePropagation()
-            e.stopPropagation()
-            e.preventDefault()
-            if (forceDisable) return false;
-            makeForceDisable();
-            console.log('Server status is not real-time available. Socket errored :(');
-            return false;
-        };
-
-        statusSocket.onmessage = function (e) {
-            if (forceDisable) return;
-            var data = JSON.parse(e.data);
+        let realTimeStatusEnabled = true;
+        let realTimeStatusMessageID = null;
+        const webSocketBridge = new channels.WebSocketBridge();
+        webSocketBridge.connect(SERVER_STATUS_URL);
+        webSocketBridge.listen(function(action, stream) {
+            var data = action;
             if (data) {
                 if (data.server_mode == 'init') {
                     console.log('Server status real-time is available :)');
@@ -71,16 +45,6 @@
                     }
                 }
             }
-        };
-
-        statusSocket.onclose = function (e) {
-            if (forceDisable) return;
-            makeForceDisable();
-            console.error('Server status is not real-time available. Socket closed unexpectedly :(');
-        };
-    } catch (e) {
-        if (forceDisable) return;
-        makeForceDisable();
-        console.log('Server status is not real-time available. Socket errored :(');
-    }
-})();
+        });
+    })();
+});

@@ -28,7 +28,7 @@
         <td>Flight crew</td>
         <td>
             {% if flight.crew %}
-            <code>{{ flight.crew.crew_id }}</code>
+            <code>{{ flight.crew_name }}</code>
             {% else %}
             No crew
             {% endif %}
@@ -70,11 +70,9 @@
     <tr>
         <td>
             {% if user_auth %}
-            <a href="{{ user.action_cancel }}">
-                <button class="small">
-                    <i class="fas fa-ban"></i>
-                    Cancel
-                </button>
+            <a href="{{ user.action_cancel }}" class="button small">
+                <i class="fas fa-ban"></i>
+                Cancel
             </a>
             {% endif %}
             {{ user.data.surname }}
@@ -140,19 +138,15 @@
 </nav>
 
 {% if back_button %}
-<a href="{{ back_button }}">
-    <button class="backButton">
-        &lt; Go back
-    </button>
+<a href="{{ back_button }}" class="button backButton">
+    &lt; Go back
 </a>
 {% endif %}
 
 {% if user_auth %}
 {% if add_user_button %}
-<a href="{{ add_user_button }}">
-    <button class="backButton addNewPassangerButton">
-        Add new passanger
-    </button>
+<a href="{{ add_user_button }}" class="button backButton addNewPassangerButton">
+    Add new passanger
 </a>
 {% endif %}
 {% endif %}

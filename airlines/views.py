@@ -4,10 +4,12 @@
 #
 from django.http import HttpResponse
 from django.template import loader
-from django.db.models import Count
+from django.db.models import Count, CharField, Value as V
+from django.db.models.functions import Concat
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.http import urlencode
 from django.shortcuts import redirect
+from django.db import transaction
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import OperationalError
@@ -16,9 +18,19 @@ from django.utils.http import urlquote, urlunquote
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from background_task import background
+from subprocess import Popen
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from threading import Thread
+import asyncio
 import json
+import glob
+import os
+import inspect
+import time
 
-from .models import Plane, Flight, User, Crew, Worker
+
+from .models import Plane, Flight, User, Crew, Worker, ServerStatusChannels
 from .forms import DataGeneratorForm, AddUserFlightForm, FilterFlightsForm
 from .datagenerator.planes import PlanesGenerator
 
@@ -28,7 +40,6 @@ from . import rendering
 # Maximum number of rows per single flight edit page
 #
 FLIGHT_EDIT_PAGE_SIZE = 15
-
 
 #
 # Default page with flights list
@@ -80,7 +91,7 @@ def flights(request):
             for flight in context['page_data']:
                 page_data.append({
                     **vars(flight),
-                    'crew_id': (flight.crew.crew_id if flight.crew else None),
+                    'crew_name': (flight.crew.capitain.getFullName() if flight.crew.capitain else None),
                     'seats_count': flight.plane.seats_count,
                     'tickets_count': flight.tickets.count,
                     'plane_reg_id': flight.plane.reg_id,
@@ -98,6 +109,9 @@ def flights(request):
         return context
 
     data_list = Flight.objects.annotate(number_of_tickets=Count('tickets'))
+    data_list = data_list.annotate(
+        crew_name=Concat('crew__capitain__name', V(' '), 'crew__capitain__surname', output_field=CharField())
+    )
 
     if filter_date_from:
         data_list = data_list.filter(start__date__gte=filter_date_from)
@@ -113,7 +127,7 @@ def flights(request):
             'plane__reg_id', 'src', 'dest',
             'start', 'end', 'plane__seats_count',
             'number_of_tickets',
-            'crew_id'
+            'crew_name'
         ],
         mapping=mapFlightData
     )
@@ -136,7 +150,10 @@ def flightEdit(request):
         }
         return rendering.renderContentTemplate(request, context, template)
 
-    flight = Flight.objects.get(id=id)
+    flight = Flight.objects.annotate(
+        crew_name=Concat('crew__capitain__name', V(' '), 'crew__capitain__surname', output_field=CharField())
+    ).get(id=id)
+
     if not flight:
         template = loader.get_template('index.html')
         context = {
@@ -321,12 +338,16 @@ def users(request):
 #
 def crews(request):
     data_list = Crew.objects.annotate(number_of_workers=Count('worker'))
+    data_list = data_list.annotate(
+        crew_name=Concat('capitain__name', V(' '), 'capitain__surname', output_field=CharField())
+    )
+
     return rendering.renderContentPage(
         'crews',
         request,
         data_list,
         [
-            'crew_id', 'number_of_workers'
+            'crew_name', 'number_of_workers'
         ]
     )
 
@@ -336,12 +357,16 @@ def crews(request):
 #
 def workers(request):
     data_list = Worker.objects.all()
+    data_list = data_list.annotate(
+        crew_name=Concat('crew__capitain__name', V(' '), 'crew__capitain__surname', output_field=CharField())
+    )
+
     return rendering.renderContentPage(
         'workers',
         request,
         data_list,
         [
-            'name', 'surname', 'crew__crew_id'
+            'name', 'surname', 'crew_name'
         ]
     )
 
@@ -352,17 +377,27 @@ def crewsPanel(request):
     return rendering.renderStaticPage('crews-panel')
 
 #
-# Task for generating example database using the data generator
+# Task thread for generating example database using the data generator
 #
-@background(schedule=0)
-def dataGeneratorTask(form):
+def dataGeneratorThread(form):
+    time.sleep(1)
+
+    serverStatus = {
+        'ServerStatusChannels': ServerStatusChannels
+    }
+
     context = {}
-    data = PlanesGenerator(Plane, Flight, User, Worker, Crew, form)
+    data = PlanesGenerator(serverStatus, Plane, Flight, User, Worker, Crew, form)
     context['content_message'] = 'Generated ' + str(len(data['planes'])) + ' plane/-s, ' + str(
         len(data['flights'])) + ' flight/-s and ' + str(len(data['users'])) + ' user/-s'
     context['content'] = 'data-generator-answer'
 
-
+#
+# Task for generating example database using the data generator
+#
+def dataGeneratorTask(form):
+    thread = Thread(target=dataGeneratorThread, args=(form,))
+    thread.start()
 #
 # Data generator input form
 #
@@ -428,7 +463,6 @@ def dataGenerator(request, contextPrototype={}):
     # }
     # return HttpResponse(template.render(context, request))
 
-
 #
 # Popup containing data generator form
 #
@@ -438,6 +472,101 @@ def dataGeneratorPopup(request):
     context = {
         'content': 'data-generator'
     }
+    return rendering.renderContentTemplate(request, context, template)
+
+def sendServerStatusMessage(message):
+    channel_layer = get_channel_layer()
+
+    with transaction.atomic():
+        allChannels = ServerStatusChannels.objects.all()
+        allChannels._result_cache = None
+        allChannels.count()
+
+    channels = allChannels
+    for channel in channels:
+        try:
+            async_to_sync(channel_layer.send)(
+                channel.name,
+                message
+            )
+        except ChannelFull:
+            nope = True
+
+#
+# Task thread for testing the app in background
+#
+def testsThread(channel_layer):
+    print('Run the tests in background tasks')
+    processes = []
+    processes.append(Popen('python -m airlines.__tests__.tests', shell=True))
+    for process in processes:
+        while True:
+            poll = process.poll()
+            if poll == None:
+                sendServerStatusMessage({
+                    'type': 'server_status_message',
+                    'message': {
+                        'task_name': 'Running tests...',
+                        'task_progress': ' (in progress)'
+                    },
+                    'mode': 'progress'
+                })
+                time.sleep(0.3)
+            else:
+                break
+
+    for process in processes:
+        process.wait()
+
+        sendServerStatusMessage({
+            'type': 'server_status_message',
+            'message': 'All tests were launched. Ending now.',
+            'mode': 'progress_end'
+        })
+
+#
+# Task for testing the app in background
+#
+def testsTask():
+    channel_layer = get_channel_layer()
+    thread = Thread(target=testsThread, args=(channel_layer,))
+    thread.start()
+
+#
+# View to just run tests task
+#
+@login_required
+def testsRun(request):
+    if request.method == 'POST':
+        testsTask()
+        return redirect('tests')
+
+#
+# View for managing tests
+#
+@login_required
+def tests(request):
+
+    test_html_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))),
+            '..',
+            'test-results',
+            'tests.html'
+        )
+    )
+    context = {
+        'content': 'tests'
+    }
+
+    with open(test_html_path) as f:
+        contents = f.read()
+        context = {
+            'content': 'tests',
+            'html_result': contents
+        }
+
+    template = loader.get_template('index.html')
     return rendering.renderContentTemplate(request, context, template)
 
 #

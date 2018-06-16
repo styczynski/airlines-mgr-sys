@@ -128,3 +128,12 @@ body > nav ul li:hover {
 body > nav ul li:hover a {
     color: #5f3237;
 }
+
+.loginButton a {
+    color: white;
+    text-decoration: none;
+}
+
+.loginButton:hover a {
+    color: #7d444a;
+}

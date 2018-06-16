@@ -8,3 +8,5 @@ from . import consumers
 websocket_urlpatterns = [
     url(r'server-status', consumers.ServerStatsConsumer),
 ]
+
+main_channel_consumer = consumers.ServerStatsConsumer
