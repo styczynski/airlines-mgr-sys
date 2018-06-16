@@ -9,3 +9,4 @@ python-env/**
 python-env
 *.rdb
 db.sqlite3
+.idea

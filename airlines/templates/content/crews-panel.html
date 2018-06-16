@@ -1,82 +1,82 @@
 <nav class="subsections">
-  <ul>
-    <li>
-      <a href="crews">
-        List
-      </a>
-    </li>
-    <li class="active">
-      <a href="crews-panel">
-        Assign to flights
-      </a>
-    </li>
-  </ul>
+    <ul>
+        <li>
+            <a href="crews">
+                List
+            </a>
+        </li>
+        <li class="active">
+            <a href="crews-panel">
+                Assign to flights
+            </a>
+        </li>
+    </ul>
 </nav>
 
 <form class="filter">
-  <table class="small">
-    {{ filter_form.as_table }}
-  </table>
-  <input class="small" type="submit" value="Apply filtering" />
+    <table class="small">
+        {{ filter_form.as_table }}
+    </table>
+    <input class="small" type="submit" value="Apply filtering"/>
 </form>
 
 <table class="crews-table">
-  <thead>
+    <thead>
     <tr>
-      <th data-view="plane-plate">
-        <a
-          class="{{ sort_links.plane__reg_id.mode }}"
-          href="{{ sort_links.plane__reg_id.link }}"
-        >
-          Plane
-        </a>
-      </th>
-      <th>
-        <a
-          class="{{ sort_links.plane__reg_id.mode }}"
-          href="{{ sort_links.plane__reg_id.link }}"
-        >
-          Crew
-        </a>
-      </th>
-      <th>
-        <a
-          class="{{ sort_links.src.mode }}"
-          href="{{ sort_links.src.link }}"
-        >
-          From
-        </a>
-      </th>
-      <th>
-        <a
-          class="{{ sort_links.dest.mode }}"
-          href="{{ sort_links.dest.link }}"
-        >
-          To
-        </a>
-      </th>
-      <th data-type="date" data-input="X" data-view="from-now">
-        <a
-          class="{{ sort_links.start.mode }}"
-          href="{{ sort_links.start.link }}"
-        >
-          Departure
-        </a>
-      </th>
-      <th data-type="date" data-input="X" data-view="from-now">
-        <a
-          class="{{ sort_links.end.mode }}"
-          href="{{ sort_links.end.link }}"
-        >
-          Arrival
-        </a>
-      </th>
+        <th data-view="plane-plate">
+            <a
+                    class="{{ sort_links.plane__reg_id.mode }}"
+                    href="{{ sort_links.plane__reg_id.link }}"
+            >
+                Plane
+            </a>
+        </th>
+        <th>
+            <a
+                    class="{{ sort_links.plane__reg_id.mode }}"
+                    href="{{ sort_links.plane__reg_id.link }}"
+            >
+                Crew
+            </a>
+        </th>
+        <th>
+            <a
+                    class="{{ sort_links.src.mode }}"
+                    href="{{ sort_links.src.link }}"
+            >
+                From
+            </a>
+        </th>
+        <th>
+            <a
+                    class="{{ sort_links.dest.mode }}"
+                    href="{{ sort_links.dest.link }}"
+            >
+                To
+            </a>
+        </th>
+        <th data-type="date" data-input="X" data-view="from-now">
+            <a
+                    class="{{ sort_links.start.mode }}"
+                    href="{{ sort_links.start.link }}"
+            >
+                Departure
+            </a>
+        </th>
+        <th data-type="date" data-input="X" data-view="from-now">
+            <a
+                    class="{{ sort_links.end.mode }}"
+                    href="{{ sort_links.end.link }}"
+            >
+                Arrival
+            </a>
+        </th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
 
 
-  </tbody>
+    </tbody>
 </table>
 
 <nav class='pages'></nav>

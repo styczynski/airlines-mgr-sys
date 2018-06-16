@@ -1,120 +1,127 @@
-$(document).ready(function(){
-  var crewsTableNav = $('nav.pages');
-  var crewsTable = $('table.crews-table');
-  var crewsTableBody = crewsTable.find('tbody');
-  
-  var PAGE_SIZE = 30;
-  
-  var pageNo = getParameterByName('page');
-  var pageOffset = '';
-  if(pageNo) {
-    pageNo = parseInt(pageNo);
-    pageOffset = pageNo*PAGE_SIZE; 
-  } else {
-    pageNo = 0;
-  }
- 
-  function extractPositiveNumParm(name) {
-    if(getParameterByName(name)) {
-      if(parseInt(getParameterByName(name))) {
-        //console.log(name+" = "+parseInt(getParameterByName(name)));
-        return parseInt(getParameterByName(name));
-      }
+$(document).ready(function () {
+    var crewsTableNav = $('nav.pages');
+    var crewsTable = $('table.crews-table');
+    var crewsTableBody = crewsTable.find('tbody');
+
+    var PAGE_SIZE = 30;
+
+    var pageNo = getParameterByName('page');
+    var pageOffset = '';
+    if (pageNo) {
+        pageNo = parseInt(pageNo);
+        pageOffset = pageNo * PAGE_SIZE;
+    } else {
+        pageNo = 0;
     }
-    //console.log(name+" = ?"); 
-    return null;
-  };
- 
-  var filterMomentFrom = moment();
-  if(extractPositiveNumParm('from_date_year')) {
-    var val = extractPositiveNumParm('from_date_year');
-    filterMomentFrom.year(val);
-    $('form.filter select[name="from_date_year"]').val(val);
-  }
-  if(extractPositiveNumParm('from_date_month')) {
-    var val = extractPositiveNumParm('from_date_month');
-    filterMomentFrom.month(val-1);
-    $('form.filter select[name="from_date_month"]').val(val);
-  }
-  if(extractPositiveNumParm('from_date_day')) {
-    var val = extractPositiveNumParm('from_date_day');
-    filterMomentFrom.date(val);
-    $('form.filter select[name="from_date_day"]').val(val);
-  }
-  
-  var filterMomentTo = moment();
-  if(extractPositiveNumParm('to_date_year')) {
-    var val = extractPositiveNumParm('to_date_year');
-    filterMomentTo.year(val);
-    $('form.filter select[name="to_date_year"]').val(val);
-  }
-  if(extractPositiveNumParm('to_date_month')) {
-    var val = extractPositiveNumParm('to_date_month');
-    filterMomentTo.month(val-1);
-    $('form.filter select[name="tom_date_month"]').val(val);
-  }
-  if(extractPositiveNumParm('to_date_day')) {
-    var val = extractPositiveNumParm('to_date_day');
-    filterMomentTo.date(val);
-    $('form.filter select[name="to_date_day"]').val(val);
-  }
- 
-  var dateFiltering = {
-    'from': filterMomentFrom.format('YYYY-MM-DD'),
-    'to': filterMomentTo.format('YYYY-MM-DD')
-  };
-  
-  
-  
-  //$('form.filter input[type="submit"]').click(function(e){
+
+    function extractPositiveNumParm(name) {
+        if (getParameterByName(name)) {
+            if (parseInt(getParameterByName(name))) {
+                //console.log(name+" = "+parseInt(getParameterByName(name)));
+                return parseInt(getParameterByName(name));
+            }
+        }
+        //console.log(name+" = ?");
+        return null;
+    };
+
+    var filterMomentFrom = null;
+    if (extractPositiveNumParm('from_date_year')) {
+        var val = extractPositiveNumParm('from_date_year');
+        filterMomentFrom.year(val);
+        $('form.filter select[name="from_date_year"]').val(val);
+    }
+    if (extractPositiveNumParm('from_date_month')) {
+        var val = extractPositiveNumParm('from_date_month');
+        filterMomentFrom.month(val - 1);
+        $('form.filter select[name="from_date_month"]').val(val);
+    }
+    if (extractPositiveNumParm('from_date_day')) {
+        var val = extractPositiveNumParm('from_date_day');
+        filterMomentFrom.date(val);
+        $('form.filter select[name="from_date_day"]').val(val);
+    }
+
+    var filterMomentTo = null;
+    if (extractPositiveNumParm('to_date_year')) {
+        var val = extractPositiveNumParm('to_date_year');
+        filterMomentTo.year(val);
+        $('form.filter select[name="to_date_year"]').val(val);
+    }
+    if (extractPositiveNumParm('to_date_month')) {
+        var val = extractPositiveNumParm('to_date_month');
+        filterMomentTo.month(val - 1);
+        $('form.filter select[name="tom_date_month"]').val(val);
+    }
+    if (extractPositiveNumParm('to_date_day')) {
+        var val = extractPositiveNumParm('to_date_day');
+        filterMomentTo.date(val);
+        $('form.filter select[name="to_date_day"]').val(val);
+    }
+
+    var dateFiltering = {
+        'from': (filterMomentFrom) ? (filterMomentFrom.format('YYYY-MM-DD')) : (null),
+        'to': (filterMomentTo) ? (filterMomentTo.format('YYYY-MM-DD')) : (null)
+    };
+
+
+    //$('form.filter input[type="submit"]').click(function(e){
     //console.log('submit');
     //var formData = $('form.filter').serialize();
     //console.log(formData);
     //e.preventDefault();
     //return false;
-  //});
-  
-  
-  function renderCrewsTable(flightsApiURL){
-    
-    var flightsApiURL = `flights?offset=${pageOffset}&from=${dateFiltering.from}&to=${dateFiltering.to}`;
-    
-    crewsTableBody.children().remove();
-    crewsTableNav.children().remove();
-    
-    function renderRowContent(crewsRow, flight, flightIndex) {
-      crewsRow = $(crewsRow);
-      crewsRow.children().remove();
-      crewsRow.attr('data-context', flightIndex);
-      crewsRow.append(`<td>${flight.plane.reg_id}</td>`);
-      
-      if(flight.crew) {
-        crewsRow.append(`<td><code>${flight.crew.crew_id}</code> (${flight.crew.worker_set.length} workers)</td>`);
-      } else {
-        crewsRow.append(`<td>No crew</td>`);
-      }
-      
-      crewsRow.append(`<td>${flight.src}</td>`);
-      crewsRow.append(`<td>${flight.dest}</td>`);
-      crewsRow.append(`<td>${flight.departure}</td>`);
-      crewsRow.append(`<td>${flight.arrival}</td>`);
-    };
-    
-    function updateRow(crewsRow, flightIndex) {
-      requestDataAPI('flights', function(flights){
-        var flight = flights[flightIndex];
-        if(!flight) return;
-        crewsTableBody.find('.content-expanded').remove();
-        renderRowContent(crewsRow, flight, flightIndex);
-        crewsTable.sortableTable('view');
-      });
-    };
-    
-    checkUserAuth(function(userAuth){
-      
-      if(userAuth) {
-        $('header > nav').children().remove();
-        $('header > nav').append(`
+    //});
+
+
+    function renderCrewsTable(flightsApiURL) {
+
+        var flightsApiURL = `flights?offset=${pageOffset}`;
+
+        if (dateFiltering.from) {
+            flightsApiURL += `&from=${dateFiltering.from}`;
+        }
+
+        if (dateFiltering.to) {
+            flightsApiURL += `&to=${dateFiltering.to}`;
+        }
+
+        crewsTableBody.children().remove();
+        crewsTableNav.children().remove();
+
+        function renderRowContent(crewsRow, flight, flightIndex) {
+            crewsRow = $(crewsRow);
+            crewsRow.children().remove();
+            crewsRow.attr('data-context', flightIndex);
+            crewsRow.append(`<td>${flight.plane.reg_id}</td>`);
+
+            if (flight.crew) {
+                crewsRow.append(`<td><code>${flight.crew.crew_id}</code> (${flight.crew.worker_set.length} workers)</td>`);
+            } else {
+                crewsRow.append(`<td>No crew</td>`);
+            }
+
+            crewsRow.append(`<td>${flight.src}</td>`);
+            crewsRow.append(`<td>${flight.dest}</td>`);
+            crewsRow.append(`<td>${flight.departure}</td>`);
+            crewsRow.append(`<td>${flight.arrival}</td>`);
+        };
+
+        function updateRow(crewsRow, flightIndex) {
+            requestDataAPI('flights', function (flights) {
+                var flight = flights[flightIndex];
+                if (!flight) return;
+                crewsTableBody.find('.content-expanded').remove();
+                renderRowContent(crewsRow, flight, flightIndex);
+                crewsTable.sortableTable('view');
+            });
+        };
+
+        checkUserAuth(function (userAuth) {
+
+            if (userAuth) {
+                $('header > nav').children().remove();
+                $('header > nav').append(`
           Logged as <span class="username">${userAuth.username}</span>
           <a href="logout">
             <button class="small">
@@ -122,96 +129,96 @@ $(document).ready(function(){
             </button>
           </a>
         `);
-      }
-      
-      requestDataAPI(flightsApiURL, function(flights, flightsRes){
-        
-        flights.forEach(function(flight, flightIndex){
-          var crewsRow = $(`<tr></tr>`);
-          renderRowContent(crewsRow, flight, flightIndex);
-          crewsRow.appendTo(crewsTable);
-        });
-        
-        
-        var navLast = '';
-        if(parseInt(flightsRes.count/PAGE_SIZE) != pageNo) {
-          navLast = `
+            }
+
+            requestDataAPI(flightsApiURL, function (flights, flightsRes) {
+
+                flights.forEach(function (flight, flightIndex) {
+                    var crewsRow = $(`<tr></tr>`);
+                    renderRowContent(crewsRow, flight, flightIndex);
+                    crewsRow.appendTo(crewsTable);
+                });
+
+
+                var navLast = '';
+                if (parseInt(flightsRes.count / PAGE_SIZE) != pageNo) {
+                    navLast = `
             <li>
-              <a href="crews-panel?page=${parseInt(flightsRes.count/PAGE_SIZE)}">
+              <a href="crews-panel?page=${parseInt(flightsRes.count / PAGE_SIZE)}">
                 &gt;&gt;
               </a>
             </li>
           `;
-        }
-        
-        var navNext = '';
-        if(flightsRes.next) {
-          navNext = `
+                }
+
+                var navNext = '';
+                if (flightsRes.next) {
+                    navNext = `
             <li>
-              <a href="crews-panel?page=${pageNo+1}">
+              <a href="crews-panel?page=${pageNo + 1}">
                 &gt;
               </a>
             </li>
           `;
-        }
-        
-        var navLeft = '';
-        for(var p=pageNo-5;p<pageNo;++p) {
-          if(p>=0 && p*PAGE_SIZE+(PAGE_SIZE-1) <= flightsRes.count) {
-            navLeft += `
+                }
+
+                var navLeft = '';
+                for (var p = pageNo - 5; p < pageNo; ++p) {
+                    if (p >= 0 && p * PAGE_SIZE + (PAGE_SIZE - 1) <= flightsRes.count) {
+                        navLeft += `
               <li>
                 <a href="crews-panel?page=${p}">
-                  ${p+1}
+                  ${p + 1}
                 </a>
               </li>
             `;
-          }
-        }
-        
-        var navRight = '';
-        for(var p=pageNo+1;p<=pageNo+5;++p) {
-          if(p>=0 && p*PAGE_SIZE+(PAGE_SIZE-1) <= flightsRes.count) {
-            navRight += `
+                    }
+                }
+
+                var navRight = '';
+                for (var p = pageNo + 1; p <= pageNo + 5; ++p) {
+                    if (p >= 0 && p * PAGE_SIZE + (PAGE_SIZE - 1) <= flightsRes.count) {
+                        navRight += `
               <li>
                 <a href="crews-panel?page=${p}">
-                  ${p+1}
+                  ${p + 1}
                 </a>
               </li>
             `;
-          }
-        }
-        
-        var navCurrent = `
+                    }
+                }
+
+                var navCurrent = `
           <li class="active">
             <a href="crews-panel?page=${pageNo}">
-              ${pageNo+1}
+              ${pageNo + 1}
             </a>
           </li>
         `;
-        
-        var navPrev = '';
-        if(flightsRes.previous) {
-          navPrev = `
+
+                var navPrev = '';
+                if (flightsRes.previous) {
+                    navPrev = `
             <li>
-              <a href="crews-panel?page=${pageNo-1}">
+              <a href="crews-panel?page=${pageNo - 1}">
                 &lt;
               </a>
             </li>
           `;
-        }
-        
-        var navFirst = '';
-        if(pageNo != 0) {
-          navFirst = `
+                }
+
+                var navFirst = '';
+                if (pageNo != 0) {
+                    navFirst = `
             <li>
               <a href="crews-panel?page=0">
                 &lt;&lt;
               </a>
             </li>
           `;
-        }
-        
-        crewsTableNav.append(`
+                }
+
+                crewsTableNav.append(`
          <ul>
             ${navFirst}
             ${navPrev}
@@ -222,55 +229,55 @@ $(document).ready(function(){
             ${navLast}
           </ul>
         `);
-        
-        crewsTable
-        .sortableTable('addView', 'plane-plate', function(value){
-          return {
-            html: '<code>' + value + '</code>'
-          };
-        })
-        .sortableTable('view')
-        .sortableTable('rowClick', function(row, table, context) {
-          if(context !== null) {
-            context = parseInt(context) || 0;
-            var flightForRow = flights[context];
-            
-            crewsTableBody.find('.content-expanded').remove();
-            
-            var tableRow = crewsTableBody.find('tr')[context];
-            var expandedContent = $('<tr></tr>');
-            expandedContent.attr('colspan', 6);
-            expandedContent.addClass('content-expanded');
-            expandedContent.addClass('no-hover');
-            
-            function changeCrewTo(newCrew) {
-              
-              patchDataAPI(`flights/update/${flightForRow.id}/`, {
-                'crew': newCrew.id
-              }, function(res){
-                updateRow(tableRow, context);
-              })
-            };
-            
-            var expandedContentData = $('<td></td>');
-            expandedContentData.attr('colspan', 6);
-            
-            var restrictedArea = '';
-            
-            if(userAuth) {
-              restrictedArea = `
+
+                crewsTable
+                    .sortableTable('addView', 'plane-plate', function (value) {
+                        return {
+                            html: '<code>' + value + '</code>'
+                        };
+                    })
+                    .sortableTable('view')
+                    .sortableTable('rowClick', function (row, table, context) {
+                        if (context !== null) {
+                            context = parseInt(context) || 0;
+                            var flightForRow = flights[context];
+
+                            crewsTableBody.find('.content-expanded').remove();
+
+                            var tableRow = crewsTableBody.find('tr')[context];
+                            var expandedContent = $('<tr></tr>');
+                            expandedContent.attr('colspan', 6);
+                            expandedContent.addClass('content-expanded');
+                            expandedContent.addClass('no-hover');
+
+                            function changeCrewTo(newCrew) {
+
+                                patchDataAPI(`flights/update/${flightForRow.id}/`, {
+                                    'crew': newCrew.id
+                                }, function (res) {
+                                    updateRow(tableRow, context);
+                                })
+                            };
+
+                            var expandedContentData = $('<td></td>');
+                            expandedContentData.attr('colspan', 6);
+
+                            var restrictedArea = '';
+
+                            if (userAuth) {
+                                restrictedArea = `
                 <button class="button-crew small">
                    <i class="fas fa-users"></i>
                    Change flight crew
                 </button>
               `;
-            }
-            
-            var detailsTextDep = moment.unix(parseInt(flightForRow.departure)).toNow();
-            var detailsTextArr = moment.unix(parseInt(flightForRow.departure)).fromNow();
-            var detailsTextSoldPerc = parseInt(flightForRow.tickets.length / flightForRow.plane.seats_count * 100)/100;
-            
-            expandedContentData.append(`
+                            }
+
+                            var detailsTextDep = moment.unix(parseInt(flightForRow.departure)).toNow();
+                            var detailsTextArr = moment.unix(parseInt(flightForRow.departure)).fromNow();
+                            var detailsTextSoldPerc = parseInt(flightForRow.tickets.length / flightForRow.plane.seats_count * 100) / 100;
+
+                            expandedContentData.append(`
               <div class="flight-details-table">
                 <table>
                   <tr>
@@ -294,27 +301,27 @@ $(document).ready(function(){
               </button>
               <div class="edit-box"></div>
             `);
-            
-            expandedContentData.find('.button-edit').click(function(){
-              window.location = `/flight-edit?id=${flightForRow.id}&back=crewsPanel`;
-            });
-            
-            expandedContentData.find('.button-crew').click(function(){
-              var editBox = expandedContentData.find('.edit-box');
-              editBox.children().remove();
-              editBox.append(`
+
+                            expandedContentData.find('.button-edit').click(function () {
+                                window.location = `/flight-edit?id=${flightForRow.id}&back=crewsPanel`;
+                            });
+
+                            expandedContentData.find('.button-crew').click(function () {
+                                var editBox = expandedContentData.find('.edit-box');
+                                editBox.children().remove();
+                                editBox.append(`
                 <input type='text' name='crew' placeholder='${row.Crew}'>
                 <ul class='input-suggestions'></ul>
               `);
-              
-              var crewSugg = editBox.find('.input-suggestions');
-              var crewInput = editBox.find('input');
-              crewInput.on('input', function(){
-                var val = crewInput.val();
-                requestDataAPI(`crews/search/${val}`, function(suggestions){
-                  crewSugg.children().remove();
-                  crewSugg.append(suggestions.map(function(crew){
-                    var option = $(`
+
+                                var crewSugg = editBox.find('.input-suggestions');
+                                var crewInput = editBox.find('input');
+                                crewInput.on('input', function () {
+                                    var val = crewInput.val();
+                                    requestDataAPI(`crews/search/${val}`, function (suggestions) {
+                                        crewSugg.children().remove();
+                                        crewSugg.append(suggestions.map(function (crew) {
+                                            var option = $(`
                       <li>
                         <code>${crew.crew_id}</code>
                         <b>Crew</b>
@@ -326,26 +333,26 @@ $(document).ready(function(){
                         </ul>
                       </li>
                     `);
-                    option.click(function(){
-                      crewInput.val(crew.crew_id);
-                      editBox.children().remove();
-                      changeCrewTo(crew);
+                                            option.click(function () {
+                                                crewInput.val(crew.crew_id);
+                                                editBox.children().remove();
+                                                changeCrewTo(crew);
+                                            });
+                                            return option;
+                                        }));
+                                    });
+                                });
+                            })
+
+                            expandedContentData.appendTo(expandedContent);
+                            expandedContent.insertAfter(tableRow);
+                        }
                     });
-                    return option;
-                  }));
-                });
-              });
-            })
-            
-            expandedContentData.appendTo(expandedContent);
-            expandedContent.insertAfter(tableRow);
-          }
+            });
         });
-      });
-    });
-  
-  };
-  
-  renderCrewsTable();
-  
+
+    };
+
+    renderCrewsTable();
+
 });

@@ -41,8 +41,6 @@ PYTHON_EXECUTABLE=python
 PIP_EXECUTABLE=pip
 VIRTUALENV_EXECUTABLE=virtualenv
 
-echo "[i] === AIRM bash script version 1.0.0 ==="
-
 
 ${PIP_EXECUTABLE} --version > /dev/null 2> /dev/null
 result="$?"

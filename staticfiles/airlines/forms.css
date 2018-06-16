@@ -1,11 +1,11 @@
 ul.errorlist {
-  font-family: 'PT Sans', sans-serif;
-  background-color: rgba(142,0,0,0.76);
-  color: white;
-  font-weight: bold;
-  list-style: none;
+    font-family: 'PT Sans', sans-serif;
+    background-color: rgba(142, 0, 0, 0.76);
+    color: white;
+    font-weight: bold;
+    list-style: none;
 }
 
 ul.errorlist li {
-  padding: 1vw;
+    padding: 1vw;
 }

@@ -1,14 +1,14 @@
 figure.real-time-status {
-  font-size: 11px;
-  float: left;
-  margin-top: 1.5vw;
+    font-size: 11px;
+    float: left;
+    margin-top: 1.5vw;
 }
 
 figure .fa-asterisk {
-  color: #4dff4d;
+    color: #4dff4d;
 }
 
 figure .fa-ban {
-  color: red;
+    color: red;
 }
 

@@ -1,155 +1,158 @@
 <table>
-  <thead>
+    <thead>
     <tr>
-      <th>Property</th>
-      <th>Value</th>
+        <th>Property</th>
+        <th>Value</th>
     </tr>
-  </thead>
-  <tbody>
-    
+    </thead>
+    <tbody>
+
     <tr>
-      <td>Connection</td>
-      <td>
-        <b>
-          {{ flight.src }} to {{ flight.dest }}
-        </b>
-        <code>
-          {{ flight.plane.reg_id }}
-        </code>
-      </td>
+        <td>Connection</td>
+        <td>
+            <b>
+                {{ flight.src }} to {{ flight.dest }}
+            </b>
+            <code>
+                {{ flight.plane.reg_id }}
+            </code>
+        </td>
     </tr>
-    
+
     <tr>
-      <td>Departure / Arrival</td>
-      <td>{{ flight.start }} / {{ flight.end }}</td>
+        <td>Departure / Arrival</td>
+        <td>{{ flight.start }} / {{ flight.end }}</td>
     </tr>
-    
+
     <tr>
-      <td>Flight crew</td>
-      <td>
-        {% if flight.crew %}
-          <code>{{ flight.crew.crew_id }}</code>
-        {% else %}
-          No crew
-        {% endif %}
-      </td>
+        <td>Flight crew</td>
+        <td>
+            {% if flight.crew %}
+            <code>{{ flight.crew.crew_id }}</code>
+            {% else %}
+            No crew
+            {% endif %}
+        </td>
     </tr>
-     
+
     <tr>
-      <td>Bought tickets</td>
-      <td>{{ flight.tickets.count }} / {{ flight.plane.seats_count }}  <i>({{ flight_fullness }}% sold)</i></td>
+        <td>Bought tickets</td>
+        <td>{{ flight.tickets.count }} / {{ flight.plane.seats_count }} <i>({{ flight_fullness }}% sold)</i></td>
     </tr>
-    
-  </tbody>
+
+    </tbody>
 </table>
 
 {% if page_data %}
-  <table>
+<table class='tickets-table'>
     <thead>
-      <tr>
+    <tr>
         <th>
-          <a 
-            class="{{ sort_links.surname.mode }}"
-            href="{{ sort_links.surname.link }}"
-          >
-            Surname
-          </a>
+            <a
+                    class="{{ sort_links.surname.mode }}"
+                    href="{{ sort_links.surname.link }}"
+            >
+                Surname
+            </a>
         </th>
         <th>
-          <a 
-            class="{{ sort_links.name.mode }}"
-            href="{{ sort_links.name.link }}"
-          >
-            Name
-          </a>
+            <a
+                    class="{{ sort_links.name.mode }}"
+                    href="{{ sort_links.name.link }}"
+            >
+                Name
+            </a>
         </th>
-      </tr>
+    </tr>
     </thead>
     <tbody>
-      {% for user in page_data %}
-        <tr>
-          <td>
+    {% for user in page_data %}
+    <tr>
+        <td>
             {% if user_auth %}
-              <a href="{{ user.action_cancel }}">
+            <a href="{{ user.action_cancel }}">
                 <button class="small">
-                   <i class="fas fa-ban"></i>
-                   Cancel
+                    <i class="fas fa-ban"></i>
+                    Cancel
                 </button>
-              </a>
+            </a>
             {% endif %}
             {{ user.data.surname }}
-          </td>
-          <td>
+        </td>
+        <td>
             {{ user.data.name }}
-          </td>
-        </tr>
-      {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
     </tbody>
-  </table>
+</table>
+{% else %}
+<table class='tickets-table'>
+</table>
 {% endif %}
 
 <nav class="pages">
-  <ul>
-    {% if first_page %}
-      <li>
-        <a href="{{ first_page }}">
-          &lt;&lt;
-        </a>
-      </li>
-    {% endif %}
-    {% if previous_page %}
-      <li>
-        <a href="{{ previous_page }}">
-          &lt;
-        </a>
-      </li>
-    {% endif %}
-    {% for page in pages %}
-      {% if page.no == current_page %}
-        <li class="active">
-          <a href="{{ page.link }}">
-            {{ page.no }}
-          </a>
-        </li>
-      {% else %}
+    <ul>
+        {% if first_page %}
         <li>
-          <a href="{{ page.link }}">
-            {{ page.no }}
-          </a>
+            <a href="{{ first_page }}">
+                &lt;&lt;
+            </a>
         </li>
-      {% endif %}
-    {% endfor %}
-    {% if next_page %}
-      <li>
-        <a href="{{ next_page }}">
-          &gt;
-        </a>
-      </li>
-    {% endif %}
-    {% if last_page %}
-      <li>
-        <a href="{{ last_page }}">
-          &gt;&gt;
-        </a>
-      </li>
-    {% endif %}
-  </ul>
+        {% endif %}
+        {% if previous_page %}
+        <li>
+            <a href="{{ previous_page }}">
+                &lt;
+            </a>
+        </li>
+        {% endif %}
+        {% for page in pages %}
+        {% if page.no == current_page %}
+        <li class="active">
+            <a href="{{ page.link }}">
+                {{ page.no }}
+            </a>
+        </li>
+        {% else %}
+        <li>
+            <a href="{{ page.link }}">
+                {{ page.no }}
+            </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        {% if next_page %}
+        <li>
+            <a href="{{ next_page }}">
+                &gt;
+            </a>
+        </li>
+        {% endif %}
+        {% if last_page %}
+        <li>
+            <a href="{{ last_page }}">
+                &gt;&gt;
+            </a>
+        </li>
+        {% endif %}
+    </ul>
 </nav>
 
 {% if back_button %}
-  <a href="{{ back_button }}">
+<a href="{{ back_button }}">
     <button class="backButton">
-      &lt; Go back
+        &lt; Go back
     </button>
-  </a>
+</a>
 {% endif %}
 
 {% if user_auth %}
-  {% if add_user_button %}
-    <a href="{{ add_user_button }}">
-      <button class="backButton">
+{% if add_user_button %}
+<a href="{{ add_user_button }}">
+    <button class="backButton addNewPassangerButton">
         Add new passanger
-      </button>
-    </a>
-  {% endif %}
+    </button>
+</a>
+{% endif %}
 {% endif %}

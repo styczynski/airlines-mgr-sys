@@ -1,59 +1,61 @@
 .content-expanded {
-  font-family: 'PT Sans', sans-serif;
+    font-family: 'PT Sans', sans-serif;
 }
 
 .content-expanded .details > ul {
-  list-style: none;
-  border-left: 2px solid #975259;
-  padding-left: 20px;
+    list-style: none;
+    border-left: 2px solid #975259;
+    padding-left: 20px;
 }
 
 .content-expanded .input-suggestions {
-  list-style: none;
-  background-color: #975259;
-  color: white;
-  padding: 0;
-  width: 80vw;
-  position: absolute;
-  margin-top: 0;
+    list-style: none;
+    background-color: #975259;
+    color: white;
+    padding: 0;
+    width: 80vw;
+    position: absolute;
+    margin-top: 0;
+    max-height: 44vh;
+    overflow-y: scroll;
 }
 
 .content-expanded input {
-  width: 78vw;
-  border: none;
-  border-top: 2px #975259 solid;
-  font-size: 120%;
-  padding-left: 14px;
-  padding-top: 3px;
-  padding-bottom: 4px;
-  margin-top: 11px;
+    width: 78vw;
+    border: none;
+    border-top: 2px #975259 solid;
+    font-size: 120%;
+    padding-left: 14px;
+    padding-top: 3px;
+    padding-bottom: 4px;
+    margin-top: 11px;
 }
 
 .content-expanded .input-suggestions > li {
-  border-bottom: 1px solid black;
-  padding-left: 20px;
+    border-bottom: 1px solid black;
+    padding-left: 20px;
 }
 
 .content-expanded .input-suggestions > li code {
-  margin-right: 10px;
-  margin-top: 10px;
-  margin-bottom: 5px;
-  padding-top: 2px;
-  padding-bottom: 2px;
-  padding-left: 12px;
-  padding-right: 12px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
 .content-expanded .input-suggestions > li:hover {
-  border-bottom: 1px solid black;
-  background-color: white;
-  font-weight: bold;
-  color: #975259;
+    border-bottom: 1px solid black;
+    background-color: white;
+    font-weight: bold;
+    color: #975259;
 }
 
 .content-expanded .input-suggestions > li > ul {
-  font-family: 'PT Sans', sans-serif;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+    font-family: 'PT Sans', sans-serif;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }

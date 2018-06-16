@@ -1,57 +1,57 @@
 <ul>
-  {% if back_button %}
+    {% if back_button %}
     <li class="backButton">
-      <a href="{{ back_button }}"> &lt; </a>
+        <a href="{{ back_button }}"> &lt; </a>
     </li>
-  {% endif %}
+    {% endif %}
 
-  {% if content == 'planes' %}
+    {% if content == 'planes' %}
     <li class="active">
-      <a href="/airlines/planes">Planes</a>
+        <a href="/airlines/planes">Planes</a>
     </li>
-  {% else %}
+    {% else %}
     <li>
-      <a href="/airlines/planes">Planes</a>
+        <a href="/airlines/planes">Planes</a>
     </li>
-  {% endif %}
-  
-  {% if content == 'flights' %}
+    {% endif %}
+
+    {% if content == 'flights' %}
     <li class="active">
-      <a href="/airlines/flights">Flights</a>
+        <a href="/airlines/flights">Flights</a>
     </li>
-  {% else %}
+    {% else %}
     <li>
-      <a href="/airlines/flights">Flights</a>
+        <a href="/airlines/flights">Flights</a>
     </li>
-  {% endif %}
-  
-  {% if content == 'users' %}
+    {% endif %}
+
+    {% if content == 'users' %}
     <li class="active">
-      <a href="/airlines/users">Users</a>
+        <a href="/airlines/users">Users</a>
     </li>
-  {% else %}
+    {% else %}
     <li>
-      <a href="/airlines/users">Users</a>
+        <a href="/airlines/users">Users</a>
     </li>
-  {% endif %}
-  
-  {% if content == 'crews' or content == 'crews-panel' %}
+    {% endif %}
+
+    {% if content == 'crews' or content == 'crews-panel' %}
     <li class="active">
-      <a href="/airlines/crews-panel">Crews</a>
+        <a href="/airlines/crews-panel">Crews</a>
     </li>
-  {% else %}
+    {% else %}
     <li>
-      <a href="/airlines/crews-panel">Crews</a>
+        <a href="/airlines/crews-panel">Crews</a>
     </li>
-  {% endif %}
-  
-  {% if content == 'workers' %}
+    {% endif %}
+
+    {% if content == 'workers' %}
     <li class="active">
-      <a href="/airlines/workers">Workers</a>
+        <a href="/airlines/workers">Workers</a>
     </li>
-  {% else %}
+    {% else %}
     <li>
-      <a href="/airlines/workers">Workers</a>
+        <a href="/airlines/workers">Workers</a>
     </li>
-  {% endif %}
+    {% endif %}
 </ul>
