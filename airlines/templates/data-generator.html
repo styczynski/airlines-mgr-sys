@@ -30,7 +30,7 @@
     <div class="headmessage">{{ content_message }}</div>
     {% endif %}
 
-    <form action="data-generator" method="post">
+    <form action="/airlines/data-generator/" method="post">
         {% csrf_token %}
         <table>
             {{ form.as_table }}

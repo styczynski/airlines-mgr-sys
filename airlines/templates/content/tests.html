@@ -1,7 +1,7 @@
 <div class="testResults">
     {{ html_result|safe }}
 </div>
-<form action="tests-run" method="post">
+<form action="/airlines/tests-run/" method="post">
     {% csrf_token %}
     <input type="submit" value="Rerun tests"/>
 </form>

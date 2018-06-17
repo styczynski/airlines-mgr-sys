@@ -45,7 +45,7 @@ class TestSeleniumUserTickets(unittest.TestCase):
         flightsRows[0].click()
 
         wait = WebDriverWait(driver, 10)
-        wait.until(EC.url_contains('/flight-edit'))
+        wait.until(EC.url_contains('-edit'))
 
         #
         # Find table with booked tickets
@@ -70,7 +70,7 @@ class TestSeleniumUserTickets(unittest.TestCase):
 
             time.sleep(3)
             wait = WebDriverWait(driver, 10)
-            wait.until(EC.url_contains('/flight-edit'))
+            wait.until(EC.url_contains('-edit'))
 
             ticketsRowsBefore = ticketsRows
             ticketsTable = driver.find_element_by_class_name("tickets-table")
@@ -89,7 +89,7 @@ class TestSeleniumUserTickets(unittest.TestCase):
         addNewPassangerButton.click()
 
         wait = WebDriverWait(driver, 10)
-        wait.until(EC.url_contains('/flight-add-user-flight'))
+        wait.until(EC.url_contains('add-user-flight'))
 
         #
         # Enter new passenger name and surname
@@ -107,7 +107,7 @@ class TestSeleniumUserTickets(unittest.TestCase):
         userSubmitButton.click()
 
         wait = WebDriverWait(driver, 10)
-        wait.until(EC.url_contains('/flight-edit'))
+        wait.until(EC.url_contains('-edit'))
         time.sleep(10)
 
         #
@@ -140,7 +140,7 @@ class TestSeleniumUserTickets(unittest.TestCase):
                 cancelButton = ticketRow.find_elements_by_css_selector('.button')[0]
                 cancelButton.click()
                 wait = WebDriverWait(driver, 10)
-                wait.until(EC.url_contains('/flight-edit'))
+                wait.until(EC.url_contains('-edit'))
                 ticketsTableAfterRemoval = driver.find_element_by_class_name("tickets-table")
                 ticketsRowsAfterRemoval = ticketsTableAfterRemoval.find_elements_by_css_selector("tbody > tr")
                 ticketsRowCountAfterRemoval = len(ticketsRowsAfterRemoval)

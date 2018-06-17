@@ -32,7 +32,7 @@
     <script src="/static/airlines/crews-panel.js"></script>
     
     <script>
-        var SERVER_STATUS_URL = '/server-status?';
+        var SERVER_STATUS_URL = '/%2Fserver-status/?';
     </script>
     <link rel="stylesheet" href="/static/airlines/server-status.css">
 
@@ -52,7 +52,7 @@
     <i class="fas fa-plane"></i> Airlines manager
     <nav>
         
-        <a href="login" class="button small loginButton">
+        <a href="/airlines/login/" class="button small loginButton">
             Login to system
         </a>
         
@@ -63,6 +63,7 @@
         
     </ul>
 </nav>
+
 
 <main>
     <nav>
@@ -114,12 +115,12 @@
     <nav class="subsections">
     <ul>
         <li>
-            <a href="crews">
+            <a href="/airlines/crews-panel/list/">
                 List
             </a>
         </li>
         <li class="active">
-            <a href="crews-panel">
+            <a href="/airlines/crews-panel/assign/">
                 Assign to flights
             </a>
         </li>
