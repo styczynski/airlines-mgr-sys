@@ -163,7 +163,7 @@ class TestSeleniumCrews(unittest.TestCase):
         # You should be redirected to flight edition page
         #
         wait = WebDriverWait(driver, 10)
-        wait.until(EC.url_contains('/flight-edit'))
+        wait.until(EC.url_contains('-edit'))
 
         endTest(driver)
 

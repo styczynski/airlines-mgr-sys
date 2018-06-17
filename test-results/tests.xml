@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite errors="0" failures="0" name="test_validator_schedules.TestValidatorSchedules-20180617024543" skipped="0" tests="6" time="3.623" timestamp="2018-06-17T02:48:00">
-	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flight_ok" time="0.654" timestamp="2018-06-17T02:47:57"/>
-	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flight_with_time_shorter_than_30_mins" time="0.456" timestamp="2018-06-17T02:47:58"/>
-	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flight_without_crew" time="0.433" timestamp="2018-06-17T02:47:58"/>
-	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flights_with_conflicting_time_for_crew" time="0.735" timestamp="2018-06-17T02:47:59"/>
-	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flights_with_conflicting_time_for_plane" time="0.720" timestamp="2018-06-17T02:48:00"/>
-	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flights_with_same_time_plane_and_crew" time="0.624" timestamp="2018-06-17T02:48:00"/>
+<testsuite errors="0" failures="0" name="test_validator_schedules.TestValidatorSchedules-20180617041125" skipped="0" tests="6" time="3.619" timestamp="2018-06-17T04:14:11">
+	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flight_ok" time="0.650" timestamp="2018-06-17T04:14:08"/>
+	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flight_with_time_shorter_than_30_mins" time="0.445" timestamp="2018-06-17T04:14:08"/>
+	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flight_without_crew" time="0.454" timestamp="2018-06-17T04:14:09"/>
+	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flights_with_conflicting_time_for_crew" time="0.702" timestamp="2018-06-17T04:14:10"/>
+	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flights_with_conflicting_time_for_plane" time="0.653" timestamp="2018-06-17T04:14:10"/>
+	<testcase classname="test_validator_schedules.TestValidatorSchedules" name="test_flights_with_same_time_plane_and_crew" time="0.713" timestamp="2018-06-17T04:14:11"/>
 	<system-out>
 <![CDATA[]]>	</system-out>
 	<system-err>

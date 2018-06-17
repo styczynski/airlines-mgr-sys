@@ -329,7 +329,7 @@ $(document).ready(function () {
             `);
 
                             expandedContentData.find('.button-edit').click(function () {
-                                window.location = `/flight-edit?id=${flightForRow.id}&back=crewsPanel`;
+                                window.location = `/airlines/flight-edit/?id=${flightForRow.id}&back=crewsPanel`;
                             });
 
                             expandedContentData.find('.button-crew').click(function () {

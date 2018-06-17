@@ -4,11 +4,11 @@
         {% if user_auth %}
         <figure class="real-time-status"></figure>
         Logged as <span class="username">{{ user_auth.username }}</span>
-        <a href="logout" class="button small loginButton">
+        <a href="/airlines/logout/" class="button small loginButton">
             Logout
         </a>
         {% else %}
-        <a href="login" class="button small loginButton">
+        <a href="/airlines/login/" class="button small loginButton">
             Login to system
         </a>
         {% endif %}
@@ -18,19 +18,19 @@
     <ul>
         {% if user_auth %}
         <li>
-            <a class="popup" href="admin-popup">
+            <a class="popup" href="/airlines/admin-popup/">
                 <i class="fas fa-unlock-alt"></i>
                 Administration
             </a>
         </li>
         <li>
-            <a class="popup" href="data-generator-popup">
+            <a class="popup" href="/airlines/data-generator-popup/">
                 <i class="fas fa-cubes"></i>
                 Data generator
             </a>
         </li>
         <li>
-            <a href="tests">
+            <a href="/airlines/tests/">
                 <i class="fas fa-cubes"></i>
                 Tests
             </a>

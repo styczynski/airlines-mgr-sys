@@ -28,7 +28,7 @@
 
     function authCheckDataAPI(callback, errCallback) {
         var params = {};
-        var path = '/api/check-auth/';
+        var path = '/airlines/api/check-auth/';
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
@@ -59,7 +59,7 @@
 
 
     function requestDataAPI(route, callback, errCallback) {
-        var path = '/api/' + route;
+        var path = '/airlines/api/' + route;
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
@@ -87,7 +87,7 @@
     };
 
     function patchDataAPI(route, params, callback, errCallback) {
-        var path = '/api/' + route;
+        var path = '/airlines/api/' + route;
         var req = new XMLHttpRequest();
         req.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
