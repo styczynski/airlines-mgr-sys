@@ -25,3 +25,4 @@ beautifulsoup4
 unittest-xml-reporting
 xmlrunner
 junit2html
+djangorestframework

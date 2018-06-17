@@ -106,6 +106,7 @@ else
             echo "[i] Install requirements..."
             ${PIP_EXECUTABLE} install -r requirements.txt
 
+            ${PYTHON_EXECUTABLE} manage.py flush --no-input
             ${PYTHON_EXECUTABLE} manage.py makemigrations
             ${PYTHON_EXECUTABLE} manage.py migrate
             ${PYTHON_EXECUTABLE} manage.py createsuperuser
