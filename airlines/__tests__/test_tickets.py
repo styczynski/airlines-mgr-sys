@@ -15,6 +15,9 @@ class TestSeleniumUserTickets(unittest.TestCase):
     #
     #
     def test_add_remove_user_tickets(self):
+        
+        generateSampleData()
+
 
         FLIGHT_TEST_PERSON_NAME = 'ZZZZZZZZZZZZZZZZZ_TESTUSERNAME'
 

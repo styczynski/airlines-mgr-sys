@@ -50,7 +50,7 @@ def printProgress(serverStatus, task, current, maximum, progressThreshold=1):
         maximum = 1
     print('[DataGenerator] ' + str(task) + ' ' + str(((current / maximum * 10000) // 10) / 10) + '%')
 
-    if not disableSockets or True:
+    if serverStatus:
         channel_layer = get_channel_layer()
         #loop = asyncio.get_event_loop()
         #loop.create_task(
@@ -88,7 +88,7 @@ def printProgressEnd(serverStatus, obj):
     users_count = len(obj['users'])
 
     print('[DataGenerator] Submitting results.')
-    if not disableSockets:
+    if serverStatus:
         try:
             channel_layer = get_channel_layer()
             allChannels = serverStatus['ServerStatusChannels'].objects.all()
@@ -293,13 +293,24 @@ def assignCrewsToFlights(serverStatus, flights_data, crews_objs):
                 crew_current_end = flight.end
 
 
-def PlanesGenerator(serverStatus, Plane, Flight, User, Worker, Crew, form_data):
+def PlanesGenerator(serverStatus, Plane, Flight, User, Worker, Crew, form_data=None):
     with transaction.atomic():
         User.objects.all().delete()
         Flight.objects.all().delete()
         Plane.objects.all().delete()
         Worker.objects.all().delete()
         Crew.objects.all().delete()
+
+    if not form_data:
+        form_data = {}
+        form_data['users_count'] = '200'
+        form_data['planes_count'] = '10'
+        form_data['plane_seats_count_min'] = '20'
+        form_data['plane_seats_count_max'] = '50'
+        form_data['plane_flights_count_min'] = '5'
+        form_data['plane_flights_count_max'] = '10'
+        form_data['plane_flights_count_per_day'] = '4'
+        form_data['plane_reg_format'] = 'CCCNNNNNN'
 
     input = form_data
     planes_data = []

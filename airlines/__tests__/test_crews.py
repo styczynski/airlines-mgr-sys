@@ -107,6 +107,9 @@ class TestSeleniumCrews(unittest.TestCase):
     #
     #
     def test_edit_button(self):
+
+        generateSampleData()
+
         driver = startTest()
 
         #
@@ -177,6 +180,9 @@ class TestSeleniumCrews(unittest.TestCase):
     #
     #
     def test_concurrently_assign_crews(self):
+
+        generateSampleData()
+
         #
         # Start two drivers to perform concurrent changes
         #

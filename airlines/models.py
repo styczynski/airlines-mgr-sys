@@ -2,46 +2,13 @@
 # Django models for airlines management sysyem
 # MIT Piotr Styczyński 2018
 #
-from django.core.exceptions import ValidationError
 from django.db import models
 
-def validatePlaneSchedule(plane):
-    flightsDayCount = {}
-
-    flights = plane.flight_set.all()
-    for flight in flights:
-        dayStr = flight.start.strftime("%d/%m/%y")
-        if not dayStr in flightsDayCount:
-            flightsDayCount[dayStr] = 1
-        else:
-            flightsDayCount[dayStr] = flightsDayCount[dayStr] + 1
-        for anotherFlight in flights:
-            if flight != anotherFlight:
-                if flight.start <= anotherFlight.start and flight.end >= anotherFlight.end:
-                    raise ValidationError(
-                        'Conflighting flight times for plane: ' + str(flight) + ' and ' + str(anotherFlight))
-
-    for flight in flights:
-        dayStr = flight.start.strftime("%d/%m/%y")
-        if flightsDayCount[dayStr] > 4:
-            raise ValidationError('Plane ' + str(plane) + ' makes ' + str(flightsDayCount[
-                dayStr]) + ' flights on ' + dayStr + ' and this value should be <= 4')
-
-def validateCrewSchedule(crew):
-    flights = crew.flight_set.all()
-    for flight in flights:
-        dayStr = flight.start.strftime("%d/%m/%y")
-        for anotherFlight in flights:
-            if flight != anotherFlight:
-                if flight.start <= anotherFlight.start and flight.end >= anotherFlight.end:
-                    raise ValidationError(
-                        'Conflighting flight times for crew: ' + str(flight) + ' and ' + str(anotherFlight))
-
+from . import validator
 
 #
 # Model for planes
 # Additional contraints:
-#   * Maximally 4 flight per day per plane
 #   * Seats count >= 20
 #   * Non-empty registration identificator
 #
@@ -54,12 +21,11 @@ class Plane(models.Model):
         return 'Plane ' + self.reg_id
 
     def clean(self):
-        if self.seats_count < 20:
-            raise ValidationError('Plane no. of seats should be >= 20')
-        if len(self.reg_id) <= 0:
-            raise ValidationError('Plane registration cannot be empty')
-        validatePlaneSchedule(self)
+        validator.validatePlane(self)
 
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super(Plane, self).save(*args, **kwargs)
 
 #
 # Model for users
@@ -78,11 +44,11 @@ class User(models.Model):
         return 'User ' + self.surname + ' ' + self.name
 
     def clean(self):
-        if len(self.name) <= 0:
-            raise ValidationError('User name should contain at least one character')
-        if len(self.surname) <= 0:
-           raise ValidationError('User surname should contain at least one character')
+        validator.validateUser(self)
 
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super(User, self).save(*args, **kwargs)
 
 #
 # Model for crew teams
@@ -95,10 +61,12 @@ class Crew(models.Model):
     def __str__(self):
         return 'Crew ' + str(self.capitain.getFullName())
 
-    #def clean(self):
-    #    if len(self.crew_id) <= 0:
-    #        raise ValidationError('Crew ID should contain at least one character')
-    #    validateCrewSchedule(self)
+    def clean(self):
+        validator.validateCrew(self)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super(Crew, self).save(*args, **kwargs)
 
 #
 # Model for flights
@@ -121,23 +89,11 @@ class Flight(models.Model):
         return 'Flight ' + self.src + ' -> ' + self.dest
 
     def clean(self):
-        if len(self.src) < 3:
-            raise ValidationError('Source airport name should contain at least three characters')
-        if len(self.dest) < 3:
-            raise ValidationError('Destination airport name should contain at least three characters')
-        if self.src == self.dest:
-            raise ValidationError('Flight source and destination are the same')
-        if self.end < self.start:
-            raise ValidationError('Invalid flight time. The flight cannot end before starting')
-        if (self.end - self.start).total_seconds() / 60.0 <= 30:
-            raise ValidationError('Invalid flight time. The flight cannot be shorter than 30 minutes')
-        if self.id:
-            if self.tickets.count() > self.plane.seats_count:
-                raise ValidationError('Could not sell ' + str(self.tickets.count()) + ' tickets for a plane with ' + str(
-                    self.plane.seats_count) + ' seats')
-        validatePlaneSchedule(self.plane)
-        validateCrewSchedule(self.crew)
+        validator.validateFlight(self)
 
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super(Flight, self).save(*args, **kwargs)
 #
 # Model for workers
 # Additional contraints:
@@ -158,13 +114,25 @@ class Worker(models.Model):
         return 'Worker ' + self.surname + ' ' + self.name
 
     def clean(self):
-        if len(self.name) <= 0:
-            raise ValidationError('Worker name should contain at least one character')
-        if len(self.surname) <= 0:
-            raise ValidationError('Worker surname should contain at least one character')
+        validator.validateWorker(self)
 
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super(Worker, self).save(*args, **kwargs)
+#
+# Model for saving websocket connections for Django Channels
+# Additional contraints:
+#   * Non-empty name
+#
 class ServerStatusChannels(models.Model):
     name = models.CharField('Channel name', max_length=100)
 
     def __str__(self):
         return 'Channel '+self.name
+
+    def clean(self):
+        validator.validateServerStatusChannels(self)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super(ServerStatusChannels, self).save(*args, **kwargs)

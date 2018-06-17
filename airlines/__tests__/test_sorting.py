@@ -14,7 +14,7 @@ class TestSeleniumDataSorting(unittest.TestCase):
     #
     #
     def test_sort_table_by_planes_reg(self):
-
+        generateSampleData()
 
         driver = startTest()
 

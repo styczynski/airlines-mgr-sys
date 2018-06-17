@@ -5,6 +5,7 @@ from rest_framework.mixins import UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework import generics
+from django.db import transaction
 from rest_framework.exceptions import APIException
 import datetime
 
@@ -61,11 +62,6 @@ class FlightList(viewsets.ModelViewSet):
         if self.request.query_params.get('to'):
             date_end = self.request.query_params.get('to')
 
-        print('FILTER FROM DATE:')
-        print(date_start)
-        print('FILTER TO DATE:')
-        print(date_end)
-
         flights = Flight.objects.all()
         if date_start:
             flights = flights.filter(start__date__gte=date_start)
@@ -87,6 +83,7 @@ class FlightPartialUpdate(viewsets.ModelViewSet, UpdateModelMixin):
     queryset = Flight.objects.all()
     serializer_class = FlightBaseSerializer
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         print(request.data)
         print(kwargs)

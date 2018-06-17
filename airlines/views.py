@@ -215,10 +215,11 @@ def cancelUserFlight(request):
     userid = request.GET.get('userid', None)
     backURL = rendering.getBackURL(request, proxyBack=True)
 
-    flight = Flight.objects.get(id=flightid)
-    user = User.objects.get(id=userid)
-    flight.tickets.remove(user)
-    flight.save()
+    with transaction.atomic():
+        flight = Flight.objects.get(id=flightid)
+        user = User.objects.get(id=userid)
+        flight.tickets.remove(user)
+        flight.save()
 
     template = loader.get_template('index.html')
     context = {}
@@ -278,21 +279,22 @@ def addUserFlight(request):
                 }, proxyBack=True)
                 return formDefaultRedirect()
 
-            user = None
-            try:
-                user = User.objects.get(name=user_name, surname=user_surname)
-                backURL = rendering.getBackURL(request, {
-                    'info': urlquote('The existing user was added to the flight.')
-                }, proxyBack=True)
-            except ObjectDoesNotExist:
-                user = User(name=user_name, surname=user_surname)
-                user.save()
-                backURL = rendering.getBackURL(request, {
-                    'info': urlquote('New user was added to the flight.')
-                }, proxyBack=True)
+            with transaction.atomic():
+                user = None
+                try:
+                    user = User.objects.get(name=user_name, surname=user_surname)
+                    backURL = rendering.getBackURL(request, {
+                        'info': urlquote('The existing user was added to the flight.')
+                    }, proxyBack=True)
+                except ObjectDoesNotExist:
+                    user = User(name=user_name, surname=user_surname)
+                    user.save()
+                    backURL = rendering.getBackURL(request, {
+                        'info': urlquote('New user was added to the flight.')
+                    }, proxyBack=True)
 
-            flight.tickets.add(user)
-            flight.save()
+                flight.tickets.add(user)
+                flight.save()
 
             return formDefaultRedirect()
 
