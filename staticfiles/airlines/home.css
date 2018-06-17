@@ -1,33 +1,33 @@
 section.homeContent {
-  background-color: rgb(125, 68, 74);
-  width: 100vw;
-  height: 100vh;
-  font-family: 'PT Sans', sans-serif;
-  color: white;
-  font-weight: bold;
-  padding-top: 2vw;
-  padding-left: 2vw;
+    background-color: rgb(125, 68, 74);
+    width: 100vw;
+    height: 100vh;
+    font-family: 'PT Sans', sans-serif;
+    color: white;
+    font-weight: bold;
+    padding-top: 2vw;
+    padding-left: 2vw;
 }
 
 section.homeContent > p {
-  margin: 0;
-  width: 100%;
-  text-align: center;
+    margin: 0;
+    width: 100%;
+    text-align: center;
 }
 
 section.homeContent > ul {
-  list-style: none;
-  width: 100%;
-  text-align: left;
-  margin-left: 34%;
+    list-style: none;
+    width: 100%;
+    text-align: left;
+    margin-left: 34%;
 }
 
 section.homeContent > ul li i {
-  margin-left: 20px;
+    margin-left: 20px;
 }
 
 body.home {
-  width: 100vw;
-  height: 100vw;
-  overflow: hidden;
+    width: 100vw;
+    height: 100vw;
+    overflow: hidden;
 }

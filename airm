@@ -41,8 +41,6 @@ PYTHON_EXECUTABLE=python
 PIP_EXECUTABLE=pip
 VIRTUALENV_EXECUTABLE=virtualenv
 
-echo "[i] === AIRM bash script version 1.0.0 ==="
-
 
 ${PIP_EXECUTABLE} --version > /dev/null 2> /dev/null
 result="$?"
@@ -108,6 +106,7 @@ else
             echo "[i] Install requirements..."
             ${PIP_EXECUTABLE} install -r requirements.txt
 
+            ${PYTHON_EXECUTABLE} manage.py flush --no-input
             ${PYTHON_EXECUTABLE} manage.py makemigrations
             ${PYTHON_EXECUTABLE} manage.py migrate
             ${PYTHON_EXECUTABLE} manage.py createsuperuser

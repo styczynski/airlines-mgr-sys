@@ -1,143 +1,155 @@
-
 <form action="{{ filter_action_url }}" method="post">
-  {% csrf_token %}
-  <table class="small">
-    {{ filter_form.as_table }}
-  </table>
-  <input class="small" type="submit" value="Apply filtering" />
+    {% csrf_token %}
+    <table class="small">
+        {{ filter_form.as_table }}
+    </table>
+    <input class="small" type="submit" value="Apply filtering"/>
 </form>
 
-<table>
-  <thead>
+<table class='flights-table'>
+    <thead>
     <tr>
-      <th data-view="plane-plate">
-        <a
-          class="{{ sort_links.plane__reg_id.mode }}"
-          href="{{ sort_links.plane__reg_id.link }}"
-        >
-          Plane
-        </a>
-      </th>
-      <th>
-        <a
-          class="{{ sort_links.src.mode }}"
-          href="{{ sort_links.src.link }}"
-        >
-          From
-        </a>
-      </th>
-      <th>
-        <a
-          class="{{ sort_links.dest.mode }}"
-          href="{{ sort_links.dest.link }}"
-        >
-          To
-        </a>
-      </th>
-      <th data-type="date" data-input="X" data-view="from-now">
-        <a
-          class="{{ sort_links.start.mode }}"
-          href="{{ sort_links.start.link }}"
-        >
-          Departure
-        </a>
-      </th>
-      <th data-type="date" data-input="X" data-view="from-now">
-        <a
-          class="{{ sort_links.end.mode }}"
-          href="{{ sort_links.end.link }}"
-        >
-          Arrival
-        </a>
-      </th>
-      <th>
-        <a
-          class="{{ sort_links.plane__seats_count.mode }}"
-          href="{{ sort_links.plane__seats_count.link }}"
-        >
-          Capacity
-        </a>
-      </th>
-      <th>
-        <a
-          class="{{ sort_links.number_of_tickets.mode }}"
-          href="{{ sort_links.number_of_tickets.link }}"
-        >
-          Tickets sold
-        </a>
-      </th>
+        <th data-view="plane-plate">
+            <a
+                    class="{{ sort_links.plane__reg_id.mode }} sort-by-plane-plate"
+                    href="{{ sort_links.plane__reg_id.link }}"
+            >
+                Plane
+            </a>
+        </th>
+        <th>
+            <a
+                    class="{{ sort_links.src.mode }} sort-by-from"
+                    href="{{ sort_links.src.link }}"
+            >
+                From
+            </a>
+        </th>
+        <th>
+            <a
+                    class="{{ sort_links.dest.mode }} sort-by-to"
+                    href="{{ sort_links.dest.link }}"
+            >
+                To
+            </a>
+        </th>
+        <th data-type="date" data-input="X" data-view="from-now">
+            <a
+                    class="{{ sort_links.start.mode }} sort-by-target"
+                    href="{{ sort_links.start.link }}"
+            >
+                Departure
+            </a>
+        </th>
+        <th data-type="date" data-input="X" data-view="from-now">
+            <a
+                    class="{{ sort_links.end.mode }} sort-by-plane-destination"
+                    href="{{ sort_links.end.link }}"
+            >
+                Arrival
+            </a>
+        </th>
+        <th>
+            <a
+                    class="{{ sort_links.plane__seats_count.mode }} sort-by-capacity"
+                    href="{{ sort_links.plane__seats_count.link }}"
+            >
+                Capacity
+            </a>
+        </th>
+        <th data-view="plane-plate">
+            <a
+                    class="{{ sort_links.crew_name.mode }} sort-by-crew"
+                    href="{{ sort_links.crew_name.link }}"
+            >
+                Crew
+            </a>
+        </th>
+        <th>
+            <a
+                    class="{{ sort_links.number_of_tickets.mode }} sort-by-tickets"
+                    href="{{ sort_links.number_of_tickets.link }}"
+            >
+                Tickets sold
+            </a>
+        </th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
 
     {% if page_data %}
-      {% for flight in page_data %}
-        <tr data-context="{{ flight.flight_link }}">
-            <td>{{ flight.plane_reg_id }}</td>
-            <td>{{ flight.src }}</td>
-            <td>{{ flight.dest }}</td>
-            <td>{{ flight.start|date:"U" }}</td>
-            <td>{{ flight.end|date:"U" }}</td>
-            <td>{{ flight.seats_count }}</td>
-            <td>{{ flight.tickets_count }}</td>
-        </tr>
-      {% endfor %}
+    {% for flight in page_data %}
+    <tr data-context="{{ flight.flight_link }}">
+        <td>{{ flight.plane_reg_id }}</td>
+        <td>{{ flight.src }}</td>
+        <td>{{ flight.dest }}</td>
+        <td>{{ flight.start|date:"U" }}</td>
+        <td>{{ flight.end|date:"U" }}</td>
+        <td>{{ flight.seats_count }}</td>
+        {% if flight.crew_name %}
+        <td>{{ flight.crew_name }}</td>
+        {% else %}
+        <td> ---</td>
+        {% endif %}
+        <td>{{ flight.tickets_count }}</td>
+    </tr>
+    {% endfor %}
     {% else %}
-      <tr>
-        <td> --- </td>
+    <tr>
+        <td> ---</td>
         <td colspan="6">
-          <p>No flights are available.</p>
+            <p>No flights are available.</p>
         </td>
-      </tr>
+    </tr>
     {% endif %}
 
-  </tbody>
+    </tbody>
 </table>
 
 <nav class="pages">
-  <ul>
-    {% if first_page %}
-      <li>
-        <a href="{{ first_page }}">
-          &lt;&lt;
-        </a>
-      </li>
-    {% endif %}
-    {% if previous_page %}
-      <li>
-        <a href="{{ previous_page }}">
-          &lt;
-        </a>
-      </li>
-    {% endif %}
-    {% for page in pages %}
-      {% if page.no == current_page %}
-        <li class="active">
-          <a href="{{ page.link }}">
-            {{ page.no }}
-          </a>
-        </li>
-      {% else %}
+    <ul>
+        {% if first_page %}
         <li>
-          <a href="{{ page.link }}">
-            {{ page.no }}
-          </a>
+            <a href="{{ first_page }}">
+                &lt;&lt;
+            </a>
         </li>
-      {% endif %}
-    {% endfor %}
-    {% if next_page %}
-      <li>
-        <a href="{{ next_page }}">
-          &gt;
-        </a>
-      </li>
-    {% endif %}
-    {% if last_page %}
-      <li>
-        <a href="{{ last_page }}">
-          &gt;&gt;
-        </a>
-      </li>
-    {% endif %}
-  </ul>
+        {% endif %}
+        {% if previous_page %}
+        <li>
+            <a href="{{ previous_page }}">
+                &lt;
+            </a>
+        </li>
+        {% endif %}
+        {% for page in pages %}
+        {% if page.no == current_page %}
+        <li class="active">
+            <a href="{{ page.link }}">
+                {{ page.no }}
+            </a>
+        </li>
+        {% else %}
+        <li>
+            <a href="{{ page.link }}">
+                {{ page.no }}
+            </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        {% if next_page %}
+        <li>
+            <a href="{{ next_page }}">
+                &gt;
+            </a>
+        </li>
+        {% endif %}
+        {% if last_page %}
+        <li>
+            <a href="{{ last_page }}">
+                &gt;&gt;
+            </a>
+        </li>
+        {% endif %}
+    </ul>
 </nav>

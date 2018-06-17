@@ -8,4 +8,7 @@ airlinesMngr/__pycache__/
 python-env/**
 python-env
 *.rdb
+airlines/migrations/
 db.sqlite3
+debug.log
+.idea

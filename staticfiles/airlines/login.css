@@ -1,14 +1,14 @@
 form.login {
-  font-family: 'PT Sans', sans-serif;
+    font-family: 'PT Sans', sans-serif;
 }
 
 form.login input {
-  display: inline-block;
+    display: inline-block;
 }
 
 form.login label {
-  display: inline-block;
-  font-weight: bold;
-  margin-left: 3vw;
-  margin-right: 1vw;
+    display: inline-block;
+    font-weight: bold;
+    margin-left: 3vw;
+    margin-right: 1vw;
 }

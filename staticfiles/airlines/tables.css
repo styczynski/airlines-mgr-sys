@@ -1,19 +1,19 @@
 table td, table th {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 table {
-  font-family: 'PT Sans', sans-serif;
-  border-spacing: 0;
-  width: 100%;
-  table-layout: fixed;
+    font-family: 'PT Sans', sans-serif;
+    border-spacing: 0;
+    width: 100%;
+    table-layout: fixed;
 }
 
 table thead {
-  background-color: #975259;
-  color: white;
+    background-color: #975259;
+    color: white;
 }
 
 table thead tr {
@@ -21,76 +21,119 @@ table thead tr {
 }
 
 table thead th {
-  padding: 10px;
-  cursor: pointer;
-  user-select: none;
+    padding: 10px;
+    cursor: pointer;
+    user-select: none;
 }
 
 table thead th a {
-  text-decoration: none;
-  color: white;
+    text-decoration: none;
+    color: white;
 }
 
 table thead th:hover {
-  background: white;
-  color: #975259;
+    background: white;
+    color: #975259;
 }
 
 table thead th:hover a {
-  color: #975259;
+    color: #975259;
 }
 
 table thead .sort-asc:after {
-  width: 13px;
-  display: inline-block;
-  content: "↓";
+    width: 13px;
+    display: inline-block;
+    content: "↓";
 }
 
 table thead .sort-desc:after {
-  width: 13px;
-  display: inline-block;
-  content: "↑";
+    width: 13px;
+    display: inline-block;
+    content: "↑";
 }
 
 table tbody td {
-  padding-left: 50px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  background: rgba(249, 195, 200, 0.0784313725490196);
-  border-bottom: 1px #975259 solid;
-  cursor: pointer;
-  user-select: none;
+    padding-left: 50px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: rgba(249, 195, 200, 0.0784313725490196);
+    border-bottom: 1px #975259 solid;
+    cursor: pointer;
+    user-select: none;
 }
 
 table tbody tr:hover {
-  background: #975259;
-  color: white;
+    background: #975259;
+    color: white;
+}
+
+table tbody tr.no-hover:hover {
+    background: rgba(249, 195, 200, 0.0784313725490196);
+    color: black;
 }
 
 table tbody tr td code {
-  background: rgba(230,215,158,0.349);
-  padding: 5px;
-  border: 1px solid #cca8a8;
-  font-family: 'PT Sans', sans-serif;
-  font-size: 76%;
-  font-weight: bold;
+    background: rgba(230, 215, 158, 0.349);
+    padding: 5px;
+    border: 1px solid #cca8a8;
+    font-family: 'PT Sans', sans-serif;
+    font-size: 76%;
+    font-weight: bold;
 }
 
 table.small select {
-  display: inline-block;
+    display: inline-block;
 }
 
 input.small {
-  padding: 0.3vw !important;
-  margin-left: 0 !important;
-  margin-top: 0 !important;
-  width: 100%;
+    padding: 0.3vw !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    width: 100%;
 }
 
 table.small th {
-  padding-left: 50px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  background: rgba(249, 195, 200, 0.0784313725490196);
-  border-bottom: 1px #975259 solid;
+    padding-left: 50px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: rgba(249, 195, 200, 0.0784313725490196);
+    border-bottom: 1px #975259 solid;
+}
+
+.flight-details {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.flight-details li {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.flight-details code {
+    margin-right: 20px;
+}
+
+.flight-details-wrapper {
+    margin-left: 20px;
+}
+
+.flight-details-table table {
+    margin-top: 0;
+    width: 80vw;
+    background: white;
+}
+
+.flight-details-table table tr {
+    cursor: default;
+}
+
+.flight-details-table table td {
+    cursor: default;
+}
+
+.flight-details-table table tr:hover {
+    background: white;
+    color: black;
 }

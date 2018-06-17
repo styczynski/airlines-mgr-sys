@@ -16,10 +16,13 @@ hyperlink==18.0.0
 idna==2.6
 incremental==17.5.0
 msgpack==0.5.6
-pypiwin32==223
 pytz==2018.4
-pywin32==223
 six==1.11.0
 Twisted==18.4.0
 txaio==2.10.0
 zope.interface==4.5.0
+beautifulsoup4
+unittest-xml-reporting
+xmlrunner
+junit2html
+djangorestframework

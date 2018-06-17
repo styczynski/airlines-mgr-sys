@@ -1,77 +1,104 @@
 {% load static %}
-
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8"/>
-        <meta content="width=device-width, initial-scale=1" name="viewport"/>
-        <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet" type="text/css"/>
-        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css"/>
-        <title>Airlines manager</title>
-        <link rel="shortcut icon" href="{% static 'airlines/favicon.ico' %}" />
-        <script src="{% static 'airlines/vendor/jquery-3.3.1.min.js' %}"></script>
-        <script src="{% static 'airlines/vendor/magnific-popup.js' %}"></script>
-        <script src="{% static 'airlines/vendor/moment.js' %}"></script>
-        <script src="{% static 'airlines/sortable-table.js' %}"></script>
-        <script src="{% static 'airlines/index.js' %}"></script>
-        <script src="{% static 'airlines/navigation.js' %}"></script>
-        <script src="{% static 'airlines/header.js' %}"></script>
-        <script src="{% static 'airlines/messages.js' %}"></script>
-        <link rel="stylesheet" href="{% static 'airlines/vendor/magnific-popup.css' %}">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.12/css/all.css" integrity="sha384-G0fIWCsCzJIMAVNQPfjH08cyYaUtMwjJwqiRKxxE/rx96Uroj1BtIQ6MLJuheaO9" crossorigin="anonymous">
-        <link rel="stylesheet" href="{% static 'airlines/header.css' %}">
-        <link rel="stylesheet" href="{% static 'airlines/navigation.css' %}">
-        <link rel="stylesheet" href="{% static 'airlines/tables.css' %}">
-        <link rel="stylesheet" href="{% static 'airlines/dialogs.css' %}">
-        <link rel="stylesheet" href="{% static 'airlines/messages.css' %}">
-        <link rel="stylesheet" href="{% static 'airlines/login.css' %}">
-        <link rel="stylesheet" href="{% static 'airlines/forms.css' %}">
-        <link rel="stylesheet" href="{% static 'airlines/home.css' %}">
-    </head>
-    
-    {% if content == 'home' %}
-      <body class="home">
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet" type="text/css"/>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css"/>
+    <title>Airlines manager</title>
+    <link rel="shortcut icon" href="{% static 'airlines/favicon.ico' %}"/>
+    <script src="{% static 'airlines/vendor/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'airlines/vendor/magnific-popup.js' %}"></script>
+    <script src="{% static 'airlines/vendor/moment.js' %}"></script>
+    <script src="{% static 'airlines/sortable-table.js' %}"></script>
+    <script src="{% static 'airlines/header.js' %}"></script>
+    <script src="{% static 'airlines/messages.js' %}"></script>
+    <script src="{% static 'airlines/fetch.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'airlines/vendor/magnific-popup.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.12/css/all.css"
+          integrity="sha384-G0fIWCsCzJIMAVNQPfjH08cyYaUtMwjJwqiRKxxE/rx96Uroj1BtIQ6MLJuheaO9" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'airlines/header.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/navigation.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/tables.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/dialogs.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/messages.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/login.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/home.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/crews-panel.css' %}">
+    <link rel="stylesheet" href="{% static 'airlines/test-results.css' %}">
+    {% if content == 'crews-panel' %}
+    <script src="{% static 'airlines/crews-panel.js' %}"></script>
     {% else %}
-      <body>
+    <script src="{% static 'airlines/index.js' %}"></script>
     {% endif %}
-    
-      {% include "navigation/header.html" %}
-        
-      <main>
-        <nav>
-          {% include "navigation/navigation.html" %}
-        </nav>
-      
-        {% if content == 'home' %}
-          {% include "content/home.html" %}
-        {% endif %}
-        {% if content == 'add-user-form' %}
-          {% include "content/add-user-form.html" %}
-        {% endif %}
-        {% if content == 'flight-edit-not-found' %}
-          {% include "content/flight-edit-not-found.html" %}
-        {% endif %}
-        {% if content == 'flight-edit' %}
-          {% include "content/flight-edit.html" %}
-        {% endif %}
-        {% if content == 'flights' %}
-          {% include "content/flights.html" %}
-        {% endif %}
-        {% if content == 'planes' %}
-          {% include "content/planes.html" %}
-        {% endif %}
-        {% if content == 'users' %}
-          {% include "content/users.html" %}
-        {% endif %}
-      </main>
-      
-      {% include "navigation/footer.html" %}
-      
-      {% include "navigation/messages.html" %}
-      
-      {% if user_auth %}
-        {% include "sockets/server_status.html" %}
-      {% endif %}
-      
-    </body>
+    <script>
+        var SERVER_STATUS_URL = '{{ server_status_url }}';
+    </script>
+    <link rel="stylesheet" href="{% static 'airlines/server-status.css' %}">
+
+
+
+    <script src="{% static 'channels/js/websocketbridge.js' %}"></script>
+
+
+    <script src="{% static 'airlines/server-status.js' %}"></script>
+</head>
+
+{% if content == 'home' %}
+<body class="home">
+{% else %}
+<body>
+{% endif %}
+
+{% include "navigation/header.html" %}
+
+<main>
+    <nav>
+        {% include "navigation/navigation.html" %}
+    </nav>
+
+    {% if content == 'home' %}
+    {% include "content/home.html" %}
+    {% endif %}
+    {% if content == 'add-user-form' %}
+    {% include "content/add-user-form.html" %}
+    {% endif %}
+    {% if content == 'flight-edit-not-found' %}
+    {% include "content/flight-edit-not-found.html" %}
+    {% endif %}
+    {% if content == 'flight-edit' %}
+    {% include "content/flight-edit.html" %}
+    {% endif %}
+    {% if content == 'flights' %}
+    {% include "content/flights.html" %}
+    {% endif %}
+    {% if content == 'planes' %}
+    {% include "content/planes.html" %}
+    {% endif %}
+    {% if content == 'users' %}
+    {% include "content/users.html" %}
+    {% endif %}
+    {% if content == 'crews' %}
+    {% include "content/crews.html" %}
+    {% endif %}
+    {% if content == 'workers' %}
+    {% include "content/workers.html" %}
+    {% endif %}
+    {% if content == 'crews-panel' %}
+    {% include "content/crews-panel.html" %}
+    {% endif %}
+    {% if content == 'tests' %}
+    {% include "content/tests.html" %}
+    {% endif %}
+
+</main>
+
+{% include "navigation/footer.html" %}
+
+{% include "navigation/messages.html" %}
+
+</body>
 </html>
+
